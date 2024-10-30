@@ -1,4 +1,4 @@
-package psql
+package message
 
 import (
 	"context"
@@ -15,14 +15,14 @@ type MessageRepository struct {
 	db *sql.DB
 }
 
-func NewMessageRepository(db *sql.DB) interfaces.MessageRepository {
+func NewMessageRepository(db *sql.DB) interfaces.Repository[entity.MessageEntity] {
 	return &MessageRepository{db: db}
 }
 
-func (r *MessageRepository) GetAllByChatId(ctx context.Context, chatId uuid.UUID) ([]*entity.MessageEntity, error) {
+func (r *MessageRepository) Get(ctx context.Context) ([]*entity.MessageEntity, error) {
 	var messages []*entity.MessageEntity
 
-	rows, err := r.db.QueryContext(ctx, retrieveAllMessagesByChatId, chatId)
+	rows, err := r.db.QueryContext(ctx, retrieveAllMessages)
 	if err != nil {
 		return nil, err
 	}

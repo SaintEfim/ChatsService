@@ -1,38 +1,24 @@
-package psql
+package chat
 
 import (
 	"context"
 	"database/sql"
 	"errors"
 
-	"ChatsService/config"
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
-	_ "github.com/lib/pq"
 )
 
 type ChatRepository struct {
-	db  *sql.DB
-	cfg *config.Config
+	db *sql.DB
 }
 
-func Connect(cfg *config.Config) (*sql.DB, error) {
-	db, err := sql.Open("postgres", cfg.ConnectionStrings.ServiceDb)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return db, nil
-}
-
-func NewChatRepository(db *sql.DB, cfg *config.Config) interfaces.ChatRepository {
+func NewChatRepository(db *sql.DB) interfaces.Repository[entity.ChatEntity] {
 	return &ChatRepository{
-		db:  db,
-		cfg: cfg,
+		db: db,
 	}
 }
 

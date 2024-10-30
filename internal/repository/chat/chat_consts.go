@@ -1,4 +1,4 @@
-package psql
+package chat
 
 const (
 	retrieveAllChats = `SELECT id, name, employees_ids FROM chats`
