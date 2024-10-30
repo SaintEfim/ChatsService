@@ -1,4 +1,4 @@
-package connection
+package database
 
 import (
 	"ChatsService/config"
