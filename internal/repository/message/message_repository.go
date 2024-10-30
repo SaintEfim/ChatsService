@@ -9,34 +9,30 @@ import (
 	"ChatsService/internal/models/interfaces"
 
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 )
 
 type MessageRepository struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewMessageRepository(db *sql.DB) interfaces.Repository[entity.MessageEntity] {
+const (
+	retrieveAllMessages = `SELECT id, chat_id, employee_id, text FROM messages`
+	retrieveMessageById = `SELECT id, chat_id, employee_id, text FROM messages WHERE id = $1`
+	createMessage       = `INSERT INTO messages (id, chat_id, employee_id, text) VALUES ($1, $2, $3, $4)`
+	deleteMessage       = `DELETE FROM messages WHERE id = $1`
+	updateMessage       = `UPDATE messages SET text = $1 WHERE id = $2`
+)
+
+func NewMessageRepository(db *sqlx.DB) interfaces.Repository[entity.MessageEntity] {
 	return &MessageRepository{db: db}
 }
 
 func (r *MessageRepository) Get(ctx context.Context) ([]*entity.MessageEntity, error) {
-	var messages []*entity.MessageEntity
+	messages := make([]*entity.MessageEntity, 0)
 
-	rows, err := r.db.QueryContext(ctx, retrieveAllMessages)
+	err := r.db.SelectContext(ctx, &messages, retrieveAllMessages)
 	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		message := &entity.MessageEntity{}
-		if err := rows.Scan(&message.Id, &message.ChatId, &message.EmployeeId, &message.Text); err != nil {
-			return nil, err
-		}
-		messages = append(messages, message)
-	}
-
-	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
@@ -46,7 +42,7 @@ func (r *MessageRepository) Get(ctx context.Context) ([]*entity.MessageEntity, e
 func (r *MessageRepository) GetOneById(ctx context.Context, id uuid.UUID) (*entity.MessageEntity, error) {
 	message := &entity.MessageEntity{}
 
-	if err := r.db.QueryRowContext(ctx, retrieveMessageById, id).Scan(&message.Id, &message.EmployeeId, &message.Text); err != nil {
+	if err := r.db.GetContext(ctx, &message, retrieveMessageById, id); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, err
 		}
@@ -87,7 +83,6 @@ func (r *MessageRepository) Delete(ctx context.Context, id uuid.UUID) error {
 
 func (r *MessageRepository) Update(ctx context.Context, id uuid.UUID, message *entity.MessageEntity) error {
 	result, err := r.db.ExecContext(ctx, updateMessage, message.Text, id)
-
 	if err != nil {
 		return err
 	}
