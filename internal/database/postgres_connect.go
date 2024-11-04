@@ -2,18 +2,18 @@ package database
 
 import (
 	"ChatsService/config"
+	"context"
 
 	"github.com/jmoiron/sqlx"
 )
 
-func PostgresConnect(cfg *config.Config) (*sqlx.DB, error) {
+func PostgresConnect(ctx context.Context, cfg *config.Config) (*sqlx.DB, error) {
 	db, err := sqlx.Open("postgres", cfg.ConnectionStrings.ServiceDb)
 	if err != nil {
 		return nil, err
 	}
 
-	err = db.Ping()
-	if err != nil {
+	if err = db.PingContext(ctx); err != nil {
 		return nil, err
 	}
 
