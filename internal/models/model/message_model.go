@@ -1,4 +1,4 @@
-package dto
+package model
 
 import (
 	"time"
@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type MessageDto struct {
+type MessageModel struct {
 	Id         uuid.UUID `json:"id"`
 	ChatId     uuid.UUID `json:"chatId"`
 	EmployeeId uuid.UUID `json:"employeeId"`

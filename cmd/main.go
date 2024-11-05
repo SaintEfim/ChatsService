@@ -2,11 +2,14 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 
 	"ChatsService/config"
 	"ChatsService/internal/database"
-	"ChatsService/internal/repository/chat"
-	"ChatsService/internal/repository/message"
+	"ChatsService/internal/handler"
+	"ChatsService/internal/models/interfaces"
+	"ChatsService/internal/repository"
+	"ChatsService/internal/server"
 	"ChatsService/pkg/logger"
 
 	"github.com/jmoiron/sqlx"
@@ -28,6 +31,28 @@ func registerPostgres(lc fx.Lifecycle, db *sqlx.DB) {
 	})
 }
 
+func registerServer(ctx context.Context, lifecycle fx.Lifecycle, srv interfaces.Server) {
+	lifecycle.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			var err error
+			go func() {
+				err = srv.Run(ctx)
+			}()
+
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+		OnStop: func(ctx context.Context) error {
+			if err := srv.Stop(ctx); err != nil {
+				return fmt.Errorf("failed to stop server: %w", err)
+			}
+			return nil
+		},
+	})
+}
+
 func main() {
 	fx.New(
 		fx.Provide(func() (*config.Config, error) {
@@ -35,9 +60,13 @@ func main() {
 		}),
 		fx.Provide(
 			logger.NewLogger,
-			chat.NewChatRepository,
-			message.NewMessageRepository,
+			repository.NewChatRepository,
+			repository.NewMessageRepository,
 			database.PostgresConnect,
+			server.NewHTTPServer,
+			server.NewServer,
+			handler.NewChatHandler,
+			handler.NewMessageHandler,
 		),
 		fx.Invoke(registerPostgres),
 	)
