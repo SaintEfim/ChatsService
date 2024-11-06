@@ -1,11 +1,11 @@
 package handler
 
 import (
+	"ChatsService/internal/models/model"
 	"fmt"
 	"net/http"
 
 	"ChatsService/internal/models/dto"
-	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
 
 	"github.com/gin-gonic/gin"
@@ -13,10 +13,10 @@ import (
 )
 
 type ChatHandler struct {
-	controller interfaces.Controller[entity.ChatEntity]
+	controller interfaces.Controller[model.ChatModel]
 }
 
-func NewChatHandler(controller interfaces.Controller[entity.ChatEntity]) interfaces.Handler {
+func NewChatHandler(controller interfaces.Controller[model.ChatModel]) interfaces.Handler[dto.ChatDto] {
 	return &ChatHandler{controller: controller}
 }
 
@@ -87,7 +87,7 @@ func (h *ChatHandler) Create(c *gin.Context) {
 
 	var (
 		chatCreateDto dto.CreateChatDto
-		chatEntity    entity.ChatEntity
+		chatModel     model.ChatModel
 	)
 
 	if err := c.ShouldBindJSON(&chatCreateDto); err != nil {
@@ -95,19 +95,19 @@ func (h *ChatHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if err := deepcopier.Copy(&chatCreateDto).To(&chatEntity); err != nil {
+	if err := deepcopier.Copy(&chatCreateDto).To(&chatModel); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error mapping chat: %v", err)})
 		return
 	}
 
-	if err := h.controller.Create(ctx, &chatEntity); err != nil {
+	if err := h.controller.Create(ctx, &chatModel); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error creating chat: %v", err)})
 		return
 	}
 
 	c.JSON(http.StatusCreated, dto.Response{
 		Message: "Chat created successfully",
-		Data:    chatEntity.Id,
+		Data:    chatModel.Id,
 	})
 }
 
@@ -150,19 +150,19 @@ func (h *ChatHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 
 	var chatUpdateDto dto.UpdateChatDto
-	var chatEntity entity.ChatEntity
+	var chatModel model.ChatModel
 
 	if err := c.ShouldBindJSON(&chatUpdateDto); err != nil {
 		c.JSON(http.StatusBadRequest, dto.Response{Message: fmt.Sprintf("Error decoding request body: %v", err)})
 		return
 	}
 
-	if err := deepcopier.Copy(&chatUpdateDto).To(&chatEntity); err != nil {
+	if err := deepcopier.Copy(&chatUpdateDto).To(&chatModel); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error mapping chat: %v", err)})
 		return
 	}
 
-	if err := h.controller.Update(ctx, id, &chatEntity); err != nil {
+	if err := h.controller.Update(ctx, id, &chatModel); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error updating chat: %v", err)})
 		return
 	}

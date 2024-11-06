@@ -69,5 +69,6 @@ func main() {
 			handler.NewMessageHandler,
 		),
 		fx.Invoke(registerPostgres),
+		fx.Invoke(registerServer),
 	)
 }

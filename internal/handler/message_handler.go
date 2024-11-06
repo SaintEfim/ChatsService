@@ -1,11 +1,11 @@
 package handler
 
 import (
+	"ChatsService/internal/models/model"
 	"fmt"
 	"net/http"
 
 	"ChatsService/internal/models/dto"
-	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
 
 	"github.com/gin-gonic/gin"
@@ -13,10 +13,10 @@ import (
 )
 
 type MessageHandler struct {
-	controller interfaces.Controller[entity.MessageEntity]
+	controller interfaces.Controller[model.MessageModel]
 }
 
-func NewMessageHandler(controller interfaces.Controller[entity.MessageEntity]) interfaces.Handler {
+func NewMessageHandler(controller interfaces.Controller[model.MessageModel]) interfaces.Handler[dto.MessageDto] {
 	return &MessageHandler{controller: controller}
 }
 
@@ -87,7 +87,7 @@ func (h *MessageHandler) Create(c *gin.Context) {
 
 	var (
 		messageCreateDto dto.CreateMessageDto
-		messageEntity    entity.MessageEntity
+		messageModel     model.MessageModel
 	)
 
 	if err := c.ShouldBindJSON(&messageCreateDto); err != nil {
@@ -95,19 +95,19 @@ func (h *MessageHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if err := deepcopier.Copy(&messageCreateDto).To(&messageEntity); err != nil {
+	if err := deepcopier.Copy(&messageCreateDto).To(&messageModel); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error mapping message: %v", err)})
 		return
 	}
 
-	if err := h.controller.Create(ctx, &messageEntity); err != nil {
+	if err := h.controller.Create(ctx, &messageModel); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error creating message: %v", err)})
 		return
 	}
 
 	c.JSON(http.StatusCreated, dto.Response{
 		Message: "Message created successfully",
-		Data:    messageEntity.Id,
+		Data:    messageModel.Id,
 	})
 }
 
@@ -150,19 +150,19 @@ func (h *MessageHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 
 	var messageUpdateDto dto.UpdateMessageDto
-	var messageEntity entity.MessageEntity
+	var messageModel model.MessageModel
 
 	if err := c.ShouldBindJSON(&messageUpdateDto); err != nil {
 		c.JSON(http.StatusBadRequest, dto.Response{Message: fmt.Sprintf("Error decoding request body: %v", err)})
 		return
 	}
 
-	if err := deepcopier.Copy(&messageUpdateDto).To(&messageEntity); err != nil {
+	if err := deepcopier.Copy(&messageUpdateDto).To(&messageModel); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error mapping message: %v", err)})
 		return
 	}
 
-	if err := h.controller.Update(ctx, id, &messageEntity); err != nil {
+	if err := h.controller.Update(ctx, id, &messageModel); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error updating message: %v", err)})
 		return
 	}

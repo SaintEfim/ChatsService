@@ -8,6 +8,7 @@ import (
 
 	"ChatsService/config"
 	"ChatsService/internal/middleware"
+	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/interfaces"
 
 	"github.com/gin-gonic/gin"
@@ -20,12 +21,15 @@ import (
 type Server struct {
 	srv            *http.Server
 	cfg            *config.Config
-	chatHandler    interfaces.Handler
-	messageHandler interfaces.Handler
+	chatHandler    interfaces.Handler[dto.ChatDto]
+	messageHandler interfaces.Handler[dto.MessageDto]
 	logger         *zap.Logger
 }
 
-func NewServer(srv *http.Server, cfg *config.Config, chatHandler interfaces.Handler, messageHandler interfaces.Handler, logger *zap.Logger) interfaces.Server {
+func NewServer(srv *http.Server, cfg *config.Config,
+	chatHandler interfaces.Handler[dto.ChatDto],
+	messageHandler interfaces.Handler[dto.MessageDto],
+	logger *zap.Logger) interfaces.Server {
 	return &Server{
 		srv:            srv,
 		cfg:            cfg,
