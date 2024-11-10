@@ -15,9 +15,9 @@ import (
 const (
 	retrieveAllMessages = `SELECT id, chat_id, employee_id, text FROM messages`
 	retrieveMessageById = `SELECT id, chat_id, employee_id, text FROM messages WHERE id = $1`
-	createMessage       = `INSERT INTO messages (id, chat_id, employee_id, text) VALUES ($1, $2, $3, $4)`
+	createMessage       = `INSERT INTO messages (id, chat_id, employee_id, text, created_at, updated_at) VALUES ($1, $2, $3, $4, NOW(), NOW())`
 	deleteMessage       = `DELETE FROM messages WHERE id = $1`
-	updateMessage       = `UPDATE messages SET text = $1 WHERE id = $2`
+	updateMessage       = `UPDATE messages SET text = $1, updated_at = NOW() WHERE id = $2`
 )
 
 type MessageRepository struct {
@@ -55,7 +55,11 @@ func (r *MessageRepository) GetOneById(ctx context.Context, id uuid.UUID) (*enti
 func (r *MessageRepository) Create(ctx context.Context, message *entity.MessageEntity) error {
 	message.Id = uuid.New()
 
-	_, err := r.db.ExecContext(ctx, createMessage, message.Id, message.ChatId, message.EmployeeId, message.Text)
+	_, err := r.db.ExecContext(ctx, createMessage,
+		message.Id,
+		message.ChatId,
+		message.EmployeeId,
+		message.Text)
 	if err != nil {
 		return err
 	}
@@ -82,7 +86,9 @@ func (r *MessageRepository) Delete(ctx context.Context, id uuid.UUID) error {
 }
 
 func (r *MessageRepository) Update(ctx context.Context, id uuid.UUID, message *entity.MessageEntity) error {
-	result, err := r.db.ExecContext(ctx, updateMessage, message.Text, id)
+	result, err := r.db.ExecContext(ctx, updateMessage,
+		message.Text,
+		id)
 	if err != nil {
 		return err
 	}

@@ -14,11 +14,11 @@ import (
 )
 
 const (
-	retrieveAllChats = `SELECT id, name, employees_ids FROM chats`
-	retrieveChatById = `SELECT id, name, employees_ids FROM chats WHERE id = $1`
-	createChat       = `INSERT INTO chats (id, name, employees_ids) VALUES ($1, $2, $3)`
+	retrieveAllChats = `SELECT id, name, is_group, employee_ids FROM chats`
+	retrieveChatById = `SELECT id, name, is_group, employee_ids FROM chats WHERE id = $1`
+	createChat       = `INSERT INTO chats (id, name, is_group, employee_ids, created_at, updated_at) VALUES ($1, $2, $3, $4, NOW(), NOW())`
 	deleteChat       = `DELETE FROM chats WHERE id = $1`
-	updateChat       = `UPDATE chats SET name = $1, employees_ids = $2 WHERE id = $3`
+	updateChat       = `UPDATE chats SET name = $1, employee_ids = $2, updated_at = NOW() WHERE id = $3`
 )
 
 type ChatRepository struct {
@@ -58,7 +58,11 @@ func (r *ChatRepository) GetOneById(ctx context.Context, id uuid.UUID) (*entity.
 func (r *ChatRepository) Create(ctx context.Context, chat *entity.ChatEntity) error {
 	chat.Id = uuid.New()
 
-	_, err := r.db.ExecContext(ctx, createChat, chat.Id, chat.Name, pq.Array(chat.EmployeeIds))
+	_, err := r.db.ExecContext(ctx, createChat,
+		chat.Id,
+		chat.Name,
+		chat.IsGroup,
+		pq.Array(chat.EmployeeIds))
 	if err != nil {
 		return err
 	}
@@ -85,7 +89,10 @@ func (r *ChatRepository) Delete(ctx context.Context, id uuid.UUID) error {
 }
 
 func (r *ChatRepository) Update(ctx context.Context, id uuid.UUID, chat *entity.ChatEntity) error {
-	result, err := r.db.ExecContext(ctx, updateChat, chat.Name, pq.Array(chat.EmployeeIds), id)
+	result, err := r.db.ExecContext(ctx, updateChat,
+		chat.Name,
+		pq.Array(chat.EmployeeIds),
+		id)
 	if err != nil {
 		return err
 	}
