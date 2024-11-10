@@ -13,9 +13,9 @@ import (
 )
 
 const (
-	retrieveAllMessages = `SELECT id, chat_id, employee_id, text FROM messages`
-	retrieveMessageById = `SELECT id, chat_id, employee_id, text FROM messages WHERE id = $1`
-	createMessage       = `INSERT INTO messages (id, chat_id, employee_id, text, created_at, updated_at) VALUES ($1, $2, $3, $4, NOW(), NOW())`
+	retrieveAllMessages = `SELECT id, chat_id, employee_id, colleague_id, text FROM messages`
+	retrieveMessageById = `SELECT id, chat_id, employee_id, colleague_id, text FROM messages WHERE id = $1`
+	createMessage       = `INSERT INTO messages (id, chat_id, employee_id, colleague_id, text, created_at, updated_at) VALUES ($1, $2, $3, $4, NOW(), NOW())`
 	deleteMessage       = `DELETE FROM messages WHERE id = $1`
 	updateMessage       = `UPDATE messages SET text = $1, updated_at = NOW() WHERE id = $2`
 )
