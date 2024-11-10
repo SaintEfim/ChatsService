@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"ChatsService/internal/models/model"
 	"fmt"
 	"net/http"
 
 	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/interfaces"
+	"ChatsService/internal/models/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ulule/deepcopier"
