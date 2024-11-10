@@ -9,6 +9,7 @@ import (
 	"ChatsService/internal/models/model"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/ulule/deepcopier"
 )
 
@@ -60,7 +61,8 @@ func (h *MessageHandler) Get(c *gin.Context) {
 // @Router /api/v1/message/{id} [get]
 func (h *MessageHandler) GetOneById(c *gin.Context) {
 	ctx := c.Request.Context()
-	id := c.Param("id")
+
+	id, _ := uuid.Parse(c.Param("id"))
 
 	message, err := h.controller.GetOneById(ctx, id)
 	if err != nil {
@@ -84,11 +86,8 @@ func (h *MessageHandler) GetOneById(c *gin.Context) {
 // @Router /api/v1/messages [post]
 func (h *MessageHandler) Create(c *gin.Context) {
 	ctx := c.Request.Context()
-
-	var (
-		messageCreateDto dto.CreateMessageDto
-		messageModel     model.MessageModel
-	)
+	messageCreateDto := &dto.UpdateMessageDto{}
+	messageModel := &model.MessageModel{}
 
 	if err := c.ShouldBindJSON(&messageCreateDto); err != nil {
 		c.JSON(http.StatusBadRequest, dto.Response{Message: fmt.Sprintf("Error decoding request body: %v", err)})
@@ -100,7 +99,7 @@ func (h *MessageHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if err := h.controller.Create(ctx, &messageModel); err != nil {
+	if err := h.controller.Create(ctx, messageModel); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error creating message: %v", err)})
 		return
 	}
@@ -123,7 +122,8 @@ func (h *MessageHandler) Create(c *gin.Context) {
 // @Router /api/v1/messages/{id} [delete]
 func (h *MessageHandler) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
-	id := c.Param("id")
+
+	id, _ := uuid.Parse(c.Param("id"))
 
 	if err := h.controller.Delete(ctx, id); err != nil {
 		c.JSON(http.StatusNotFound, dto.Response{Message: "Message not found"})
@@ -147,10 +147,10 @@ func (h *MessageHandler) Delete(c *gin.Context) {
 // @Router /api/v1/messages/{id} [put]
 func (h *MessageHandler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
-	id := c.Param("id")
+	messageUpdateDto := &dto.UpdateMessageDto{}
+	messageModel := &model.MessageModel{}
 
-	var messageUpdateDto dto.UpdateMessageDto
-	var messageModel model.MessageModel
+	id, _ := uuid.Parse(c.Param("id"))
 
 	if err := c.ShouldBindJSON(&messageUpdateDto); err != nil {
 		c.JSON(http.StatusBadRequest, dto.Response{Message: fmt.Sprintf("Error decoding request body: %v", err)})
@@ -162,7 +162,7 @@ func (h *MessageHandler) Update(c *gin.Context) {
 		return
 	}
 
-	if err := h.controller.Update(ctx, id, &messageModel); err != nil {
+	if err := h.controller.Update(ctx, id, messageModel); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error updating message: %v", err)})
 		return
 	}

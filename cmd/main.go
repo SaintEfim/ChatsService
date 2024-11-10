@@ -1,10 +1,11 @@
-package cmd
+package main
 
 import (
 	"context"
 	"fmt"
 
 	"ChatsService/config"
+	"ChatsService/internal/controller"
 	"ChatsService/internal/database"
 	"ChatsService/internal/handler"
 	"ChatsService/internal/models/interfaces"
@@ -55,6 +56,9 @@ func registerServer(ctx context.Context, lifecycle fx.Lifecycle, srv interfaces.
 
 func main() {
 	fx.New(
+		fx.Provide(func() context.Context {
+			return context.Background()
+		}),
 		fx.Provide(func() (*config.Config, error) {
 			return config.ReadConfig("config", "yaml", "./config")
 		}),
@@ -62,6 +66,8 @@ func main() {
 			logger.NewLogger,
 			repository.NewChatRepository,
 			repository.NewMessageRepository,
+			repository.NewEmployeeChatSettingsRepository,
+			controller.NewChatController,
 			database.PostgresConnect,
 			server.NewHTTPServer,
 			server.NewServer,

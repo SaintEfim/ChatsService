@@ -64,7 +64,7 @@ func (r *MessageRepository) Create(ctx context.Context, message *entity.MessageE
 		return err
 	}
 
-	return err
+	return nil
 }
 
 func (r *MessageRepository) Delete(ctx context.Context, id uuid.UUID) error {
