@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -96,7 +95,7 @@ func (s *Server) setGinMode(ctx context.Context) {
 	case "test":
 		gin.SetMode(gin.TestMode)
 	default:
-		log.Printf("Unknown environment: %s, defaulting to 'development'", s.cfg.EnvironmentVariables.Environment)
+		s.logger.Sugar().Infof("Unknown environment: %s, defaulting to 'development'", s.cfg.EnvironmentVariables.Environment)
 		gin.SetMode(gin.DebugMode)
 	}
 }

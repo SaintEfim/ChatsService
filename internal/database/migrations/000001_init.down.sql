@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS Messages;
+DROP TABLE IF EXISTS Employee_chat_settings;
+DROP TABLE IF EXISTS Chats;

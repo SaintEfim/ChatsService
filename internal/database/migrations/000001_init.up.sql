@@ -1,4 +1,4 @@
-CREATE TABLE chats
+CREATE TABLE Chats
 (
     id           UUID PRIMARY KEY,
     name         VARCHAR(255) NOT NULL,
@@ -8,10 +8,10 @@ CREATE TABLE chats
     updated_at   TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE employee_chat_settings
+CREATE TABLE Employee_chat_settings
 (
     id           UUID PRIMARY KEY,
-    chat_id      UUID        NOT NULL REFERENCES chats (id) ON DELETE CASCADE,
+    chat_id      UUID        NOT NULL REFERENCES Chats (id) ON DELETE CASCADE,
     employee_id  UUID        NOT NULL,
     display_name VARCHAR(255),
     created_at   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -19,7 +19,7 @@ CREATE TABLE employee_chat_settings
     UNIQUE (chat_id, employee_id)
 );
 
-CREATE TABLE messages
+CREATE TABLE Messages
 (
     id           UUID PRIMARY KEY,
     chat_id      UUID        NOT NULL REFERENCES chats (id) ON DELETE CASCADE,
