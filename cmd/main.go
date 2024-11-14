@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 
 	"ChatsService/config"
 	"ChatsService/internal/controller"
@@ -47,7 +46,7 @@ func registerServer(ctx context.Context, lifecycle fx.Lifecycle, srv interfaces.
 		},
 		OnStop: func(ctx context.Context) error {
 			if err := srv.Stop(ctx); err != nil {
-				return fmt.Errorf("failed to stop server: %w", err)
+				return err
 			}
 			return nil
 		},
@@ -68,13 +67,14 @@ func main() {
 			repository.NewMessageRepository,
 			repository.NewEmployeeChatSettingsRepository,
 			controller.NewChatController,
+			controller.NewMessageController,
+			handler.NewChatHandler,
+			handler.NewMessageHandler,
 			psql.PostgresConnect,
 			server.NewHTTPServer,
 			server.NewServer,
-			handler.NewChatHandler,
-			handler.NewMessageHandler,
 		),
 		fx.Invoke(registerServer),
 		fx.Invoke(registerPostgres),
-	)
+	).Run()
 }

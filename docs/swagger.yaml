@@ -1,0 +1,377 @@
+definitions:
+  dto.ChatDto:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  dto.CreateChatDto:
+    properties:
+      employeesIds:
+        items:
+          type: string
+        type: array
+      isGroup:
+        type: boolean
+      name:
+        type: string
+    type: object
+  dto.CreateMessageDto:
+    properties:
+      chatId:
+        type: string
+      colleague_id:
+        type: string
+      employeeId:
+        type: string
+      text:
+        type: string
+    type: object
+  dto.MessageDto:
+    properties:
+      chatId:
+        type: string
+      colleague_id:
+        type: string
+      created_at:
+        type: string
+      employeeId:
+        type: string
+      id:
+        type: string
+      text:
+        type: string
+    type: object
+  dto.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+  dto.UpdateChatDto:
+    properties:
+      employeesIds:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+    type: object
+  dto.UpdateMessageDto:
+    properties:
+      text:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/chat/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get chat by id
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ChatDto'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Get chat by ID
+      tags:
+      - chats
+  /api/v1/chats:
+    get:
+      consumes:
+      - application/json
+      description: get chats
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.ChatDto'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: List chats
+      tags:
+      - chats
+    post:
+      consumes:
+      - application/json
+      description: create chat
+      parameters:
+      - description: Chat info
+        in: body
+        name: chat
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateChatDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Chat created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ChatDto'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Create a new chat
+      tags:
+      - chats
+  /api/v1/chats/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete chat
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Chat deleted successfully
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Delete chat by ID
+      tags:
+      - chats
+    put:
+      consumes:
+      - application/json
+      description: update chat`
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Chat info
+        in: body
+        name: chat
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateChatDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Chat updated successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ChatDto'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Update chat by ID
+      tags:
+      - chats
+  /api/v1/message/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get message by id
+      parameters:
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MessageDto'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Get message by ID
+      tags:
+      - messages
+  /api/v1/messages:
+    get:
+      consumes:
+      - application/json
+      description: get messages
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.MessageDto'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: List messages
+      tags:
+      - messages
+    post:
+      consumes:
+      - application/json
+      description: create message
+      parameters:
+      - description: Message info
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateMessageDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Message created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MessageDto'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Create a new message
+      tags:
+      - messages
+  /api/v1/messages/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete message
+      parameters:
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Message deleted successfully
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Delete message by ID
+      tags:
+      - messages
+    put:
+      consumes:
+      - application/json
+      description: update message`
+      parameters:
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Message info
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateMessageDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Message updated successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MessageDto'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Update message by ID
+      tags:
+      - messages
+swagger: "2.0"

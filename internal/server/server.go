@@ -2,11 +2,13 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"ChatsService/config"
+	"ChatsService/docs"
 	"ChatsService/internal/middleware"
 	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/interfaces"
@@ -14,7 +16,6 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/swag/example/basic/docs"
 	"go.uber.org/zap"
 )
 
@@ -24,6 +25,12 @@ type Server struct {
 	chatHandler    interfaces.Handler[dto.ChatDto]
 	messageHandler interfaces.Handler[dto.MessageDto]
 	logger         *zap.Logger
+}
+
+func NewHTTPServer(cfg *config.Config) *http.Server {
+	return &http.Server{
+		Addr: fmt.Sprintf("%s:%s", cfg.HTTPServer.Addr, cfg.HTTPServer.Port),
+	}
 }
 
 func NewServer(srv *http.Server, cfg *config.Config,
@@ -45,9 +52,7 @@ func (s *Server) Run(ctx context.Context) error {
 
 	s.setGinMode(ctx)
 	s.configureSwagger(ctx, g)
-
-	s.chatHandler.ConfigureRoutes(g)
-	s.messageHandler.ConfigureRoutes(g)
+	s.configurationHandler(ctx, g)
 
 	s.srv.Handler = g
 
@@ -74,8 +79,8 @@ func (s *Server) Stop(ctx context.Context) error {
 }
 
 func (s *Server) configureSwagger(ctx context.Context, router *gin.Engine) {
-	docs.SwaggerInfo.Title = "Users Service API"
-	docs.SwaggerInfo.Description = "This is a sample server Users server."
+	docs.SwaggerInfo.Title = "Chats Service API"
+	docs.SwaggerInfo.Description = "This is a sample server Chats server."
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Schemes = []string{"http"}
 
@@ -96,7 +101,7 @@ func (s *Server) setGinMode(ctx context.Context) {
 	}
 }
 
-func (s *Server) configurationHandler(g *gin.Engine) {
+func (s *Server) configurationHandler(ctx context.Context, g *gin.Engine) {
 	s.chatHandler.ConfigureRoutes(g)
 	s.messageHandler.ConfigureRoutes(g)
 }
