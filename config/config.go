@@ -4,8 +4,8 @@ import "github.com/spf13/viper"
 
 type Config struct {
 	EnvironmentVariables EnvironmentVariables `yaml:"EnvironmentVariables"`
-	ConnectionStrings    ConnectionStrings    `yaml:"ConnectionStrings"`
 	HTTPServer           HTTPServer           `yaml:"HTTPServer"`
+	DataBase             DataBase             `yaml:"DataBase"`
 	Logs                 Logs                 `yaml:"Logs"`
 }
 
@@ -13,13 +13,15 @@ type EnvironmentVariables struct {
 	Environment string `yaml:"Environment"`
 }
 
-type ConnectionStrings struct {
-	ServiceDb string `yaml:"ServiceDb"`
-}
-
 type HTTPServer struct {
 	Addr string `yaml:"Addr"`
 	Port string `yaml:"Port"`
+}
+
+type DataBase struct {
+	DriverName       string `yaml:"DriverName"`
+	DataBaseName     string `yaml:"DataBaseName"`
+	ConnectionString string `yaml:"ConnectionString"`
 }
 
 type Logs struct {

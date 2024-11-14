@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"go.uber.org/zap"
 
 	"ChatsService/config"
 	"ChatsService/internal/controller"
-	"ChatsService/internal/database"
+	"ChatsService/internal/database/psql"
 	"ChatsService/internal/handler"
 	"ChatsService/internal/models/interfaces"
 	"ChatsService/internal/repository"
@@ -62,19 +63,22 @@ func main() {
 		fx.Provide(func() (*config.Config, error) {
 			return config.ReadConfig("config", "yaml", "./config")
 		}),
+		fx.Invoke(func(ctx context.Context, cfg *config.Config, logger *zap.Logger) error {
+			return psql.CreateDatabase(ctx, cfg, logger)
+		}),
 		fx.Provide(
 			logger.NewLogger,
 			repository.NewChatRepository,
 			repository.NewMessageRepository,
 			repository.NewEmployeeChatSettingsRepository,
 			controller.NewChatController,
-			database.PostgresConnect,
+			psql.PostgresConnect,
 			server.NewHTTPServer,
 			server.NewServer,
 			handler.NewChatHandler,
 			handler.NewMessageHandler,
 		),
-		fx.Invoke(registerPostgres),
 		fx.Invoke(registerServer),
+		fx.Invoke(registerPostgres),
 	)
 }

@@ -1,10 +1,12 @@
-ConnectionStrings:
-  ServiceDB: "postgres://postgres:1234@localhost/ChatsDb?sslmode=disable"
 HTTPServer:
   Addr: "localhost"
   Port: "1000"
 EnvironmentVariables:
   Environment: "development"
+DataBase:
+  DriverName: "postgres"
+  DataBaseName : "ChatsDb"
+  ConnectionString: "postgres://postgres:1234@localhost/ChatsDb?sslmode=disable"
 Logs:
   Path: ""
   Level: info
