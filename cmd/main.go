@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"go.uber.org/zap"
 
 	"ChatsService/config"
 	"ChatsService/internal/controller"
@@ -62,9 +61,6 @@ func main() {
 		}),
 		fx.Provide(func() (*config.Config, error) {
 			return config.ReadConfig("config", "yaml", "./config")
-		}),
-		fx.Invoke(func(ctx context.Context, cfg *config.Config, logger *zap.Logger) error {
-			return psql.CreateDatabase(ctx, cfg, logger)
 		}),
 		fx.Provide(
 			logger.NewLogger,
