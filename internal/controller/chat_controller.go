@@ -27,7 +27,7 @@ func (c *ChatController) Get(ctx context.Context) ([]*model.ChatModel, error) {
 		return nil, err
 	}
 
-	if err := deepcopier.Copy(&chats).To(&chatModels); err != nil {
+	if err := deepcopier.Copy(chats).To(chatModels); err != nil {
 		return nil, err
 	}
 
@@ -42,26 +42,26 @@ func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*model.C
 		return nil, err
 	}
 
-	if err := deepcopier.Copy(&chat).To(&chatModel); err != nil {
+	if err := deepcopier.Copy(chat).To(chatModel); err != nil {
 		return nil, err
 	}
 
 	return chatModel, nil
 }
 
-func (c *ChatController) Create(ctx context.Context, chat *model.ChatModel) error {
+func (c *ChatController) Create(ctx context.Context, chat *model.ChatModel) (uuid.UUID, error) {
 	chatEntity := &entity.ChatEntity{}
 
-	if err := deepcopier.Copy(&chat).To(&chatEntity); err != nil {
-		return err
+	if err := deepcopier.Copy(chat).To(chatEntity); err != nil {
+		return uuid.Nil, err
 	}
 
-	err := c.rep.Create(ctx, chatEntity)
+	createItemId, err := c.rep.Create(ctx, chatEntity)
 	if err != nil {
-		return err
+		return uuid.Nil, err
 	}
 
-	return nil
+	return createItemId, nil
 }
 
 func (c *ChatController) Delete(ctx context.Context, id uuid.UUID) error {
@@ -76,7 +76,7 @@ func (c *ChatController) Delete(ctx context.Context, id uuid.UUID) error {
 func (c *ChatController) Update(ctx context.Context, id uuid.UUID, chat *model.ChatModel) error {
 	chatEntity := &entity.ChatEntity{}
 
-	if err := deepcopier.Copy(&chat).To(&chatEntity); err != nil {
+	if err := deepcopier.Copy(chat).To(chatEntity); err != nil {
 		return err
 	}
 

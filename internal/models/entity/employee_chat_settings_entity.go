@@ -7,10 +7,10 @@ import (
 )
 
 type EmployeeChatSettingsEntity struct {
-	Id          uuid.UUID `db:"id"`
-	ChatId      uuid.UUID `db:"chat_id"`
-	EmployeeId  uuid.UUID `db:"employee_id"`
-	DisplayName string    `db:"display_name"`
-	CreatedAt   time.Time `db:"created_at"`
-	UpdatedAt   time.Time `db:"updated_at"`
+	Id          uuid.UUID `json:"id" db:"id"`
+	ChatId      uuid.UUID `json:"chat_id" db:"chat_id"`
+	EmployeeId  uuid.UUID `json:"employee_id" db:"employee_id"`
+	DisplayName string    `json:"display_name" db:"display_name"`
+	CreatedAt   time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
 }

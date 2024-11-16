@@ -55,7 +55,7 @@ func (r *ChatRepository) GetOneById(ctx context.Context, id uuid.UUID) (*entity.
 	return chat, nil
 }
 
-func (r *ChatRepository) Create(ctx context.Context, chat *entity.ChatEntity) error {
+func (r *ChatRepository) Create(ctx context.Context, chat *entity.ChatEntity) (uuid.UUID, error) {
 	chat.Id = uuid.New()
 
 	_, err := r.db.ExecContext(ctx, createChat,
@@ -64,10 +64,10 @@ func (r *ChatRepository) Create(ctx context.Context, chat *entity.ChatEntity) er
 		chat.IsGroup,
 		pq.Array(chat.EmployeeIds))
 	if err != nil {
-		return err
+		return uuid.Nil, err
 	}
 
-	return nil
+	return chat.Id, nil
 }
 
 func (r *ChatRepository) Delete(ctx context.Context, id uuid.UUID) error {

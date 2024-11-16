@@ -15,7 +15,7 @@ import (
 const (
 	retrieveAllMessages = `SELECT id, chat_id, employee_id, colleague_id, text FROM messages`
 	retrieveMessageById = `SELECT id, chat_id, employee_id, colleague_id, text FROM messages WHERE id = $1`
-	createMessage       = `INSERT INTO messages (id, chat_id, employee_id, colleague_id, text, created_at, updated_at) VALUES ($1, $2, $3, $4, NOW(), NOW())`
+	createMessage       = `INSERT INTO messages (id, chat_id, employeeId, colleague_id, text, created_at, updated_at) VALUES ($1, $2, $3, $4, NOW(), NOW())`
 	deleteMessage       = `DELETE FROM messages WHERE id = $1`
 	updateMessage       = `UPDATE messages SET text = $1, updated_at = NOW() WHERE id = $2`
 )
@@ -52,7 +52,7 @@ func (r *MessageRepository) GetOneById(ctx context.Context, id uuid.UUID) (*enti
 	return message, nil
 }
 
-func (r *MessageRepository) Create(ctx context.Context, message *entity.MessageEntity) error {
+func (r *MessageRepository) Create(ctx context.Context, message *entity.MessageEntity) (uuid.UUID, error) {
 	message.Id = uuid.New()
 
 	_, err := r.db.ExecContext(ctx, createMessage,
@@ -61,10 +61,10 @@ func (r *MessageRepository) Create(ctx context.Context, message *entity.MessageE
 		message.EmployeeId,
 		message.Text)
 	if err != nil {
-		return err
+		return uuid.Nil, err
 	}
 
-	return nil
+	return message.Id, nil
 }
 
 func (r *MessageRepository) Delete(ctx context.Context, id uuid.UUID) error {

@@ -27,7 +27,7 @@ func (c *MessageController) Get(ctx context.Context) ([]*model.MessageModel, err
 		return nil, err
 	}
 
-	if err := deepcopier.Copy(&messages).To(&messageModels); err != nil {
+	if err := deepcopier.Copy(messages).To(messageModels); err != nil {
 		return nil, err
 	}
 
@@ -42,26 +42,26 @@ func (c *MessageController) GetOneById(ctx context.Context, id uuid.UUID) (*mode
 		return nil, err
 	}
 
-	if err := deepcopier.Copy(&message).To(&messageModel); err != nil {
+	if err := deepcopier.Copy(message).To(messageModel); err != nil {
 		return nil, err
 	}
 
 	return messageModel, nil
 }
 
-func (c *MessageController) Create(ctx context.Context, message *model.MessageModel) error {
+func (c *MessageController) Create(ctx context.Context, message *model.MessageModel) (uuid.UUID, error) {
 	messageEntity := &entity.MessageEntity{}
 
-	if err := deepcopier.Copy(&message).To(&messageEntity); err != nil {
-		return err
+	if err := deepcopier.Copy(message).To(messageEntity); err != nil {
+		return uuid.Nil, err
 	}
 
-	err := c.rep.Create(ctx, messageEntity)
+	createItemId, err := c.rep.Create(ctx, messageEntity)
 	if err != nil {
-		return err
+		return uuid.Nil, err
 	}
 
-	return nil
+	return createItemId, err
 }
 
 func (c *MessageController) Delete(ctx context.Context, id uuid.UUID) error {
@@ -76,7 +76,7 @@ func (c *MessageController) Delete(ctx context.Context, id uuid.UUID) error {
 func (c *MessageController) Update(ctx context.Context, id uuid.UUID, message *model.MessageModel) error {
 	messageEntity := &entity.MessageEntity{}
 
-	if err := deepcopier.Copy(&message).To(&messageEntity); err != nil {
+	if err := deepcopier.Copy(message).To(messageEntity); err != nil {
 		return err
 	}
 

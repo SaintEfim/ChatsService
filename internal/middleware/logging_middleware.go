@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -22,8 +23,7 @@ func LoggingMiddleware(logger *zap.Logger) gin.HandlerFunc {
 			zap.String("size_request", fmt.Sprintf("%d", c.Writer.Size())),
 		}
 
-		requestBody, err := readRequestBody(c.Request.Body)
-
+		requestBody, err := readRequestBody(c)
 		if err != nil {
 			logger.Error("Failed to read request body", zap.Error(err))
 		} else {
@@ -50,15 +50,16 @@ func LoggingMiddleware(logger *zap.Logger) gin.HandlerFunc {
 	}
 }
 
-func readRequestBody(body io.ReadCloser) (string, error) {
-	if body == nil {
+func readRequestBody(c *gin.Context) (string, error) {
+	if c.Request.Body == nil {
 		return "", errors.New("body is not empty")
 	}
-	defer body.Close()
-	buf, err := io.ReadAll(body)
 
+	buf, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		return "", err
 	}
+
+	c.Request.Body = io.NopCloser(bytes.NewBuffer(buf))
 	return string(buf), nil
 }

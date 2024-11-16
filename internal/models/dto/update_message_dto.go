@@ -1,5 +1,5 @@
 package dto
 
 type UpdateMessageDto struct {
-	Text string `json:"text"`
+	Text string `json:"text" binding:"required"`
 }

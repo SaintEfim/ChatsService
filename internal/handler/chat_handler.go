@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"ChatsService/internal/models/dto"
@@ -29,143 +28,179 @@ func (h *ChatHandler) ConfigureRoutes(r *gin.Engine) {
 	r.PUT("/api/v1/chats/:id", h.Update)
 }
 
-// Get - godoc
-// @Summary List chats
-// @Description get chats
-// @Tags chats
+// Get @Summary List chats
+// @Tags Chats
 // @Accept json
 // @Produce json
-// @Success 200 {object} dto.Response{data=[]dto.ChatDto} "Successful response"
-// @Failure 500 {object} dto.Response
+// @Success 200 {object} []dto.ChatDto
+// @Failure 500 {object} dto.ErrorDto
 // @Router /api/v1/chats [get]
 func (h *ChatHandler) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	chats, err := h.controller.Get(ctx)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error retrieving chats: %v", err)})
+		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
+			Status:      http.StatusInternalServerError,
+			Description: err.Error(),
+		})
 		return
 	}
-	c.JSON(http.StatusOK, dto.Response{Data: chats})
+	c.JSON(http.StatusOK, chats)
 }
 
-// GetOneById - godoc
-// @Summary Get chat by ID
-// @Description get chat by id
-// @Tags chats
+// GetOneById @Summary Get chat by ID
+// @Tags Chats
 // @Accept json
 // @Produce json
 // @Param id path string true "Chat ID"
-// @Success 200 {object} dto.Response{data=dto.ChatDto} "Successful response"
-// @Failure 404 {object} dto.Response
-// @Router /api/v1/chat/{id} [get]
+// @Success 200 {object} dto.ChatDto
+// @Failure 400 {object} dto.ErrorDto
+// @Failure 404 {object} dto.ErrorDto
+// @Router /api/v1/chats/{id} [get]
 func (h *ChatHandler) GetOneById(c *gin.Context) {
 	ctx := c.Request.Context()
-
-	id, _ := uuid.Parse(c.Param("id"))
-
-	chat, err := h.controller.GetOneById(ctx, id)
+	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusNotFound, dto.Response{Message: "Chat not found"})
+		c.JSON(http.StatusBadRequest, dto.ErrorDto{
+			Status:      http.StatusBadRequest,
+			Description: err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.Response{Data: chat})
+	chat, err := h.controller.GetOneById(ctx, id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, dto.ErrorDto{
+			Status:      http.StatusNotFound,
+			Description: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, chat)
 }
 
-// Create - godoc
-// @Summary Create a new chat
-// @Description create chat
-// @Tags chats
+// Create @Summary Create a new chat
+// @Tags Chats
 // @Accept json
 // @Produce json
 // @Param chat body dto.CreateChatDto true "Chat info"
-// @Success 201 {object} dto.Response{data=dto.ChatDto} "Chat created successfully"
-// @Failure 400 {object} dto.Response
-// @Failure 500 {object} dto.Response
+// @Success 201 {object} dto.CreateActionDto
+// @Failure 400 {object} dto.ErrorDto
+// @Failure 500 {object} dto.ErrorDto
 // @Router /api/v1/chats [post]
 func (h *ChatHandler) Create(c *gin.Context) {
 	ctx := c.Request.Context()
 	chatCreateDto := &dto.CreateChatDto{}
 	chatModel := &model.ChatModel{}
 
-	if err := c.ShouldBindJSON(&chatCreateDto); err != nil {
-		c.JSON(http.StatusBadRequest, dto.Response{Message: fmt.Sprintf("Error decoding request body: %v", err)})
+	if err := c.ShouldBindJSON(chatCreateDto); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorDto{
+			Status:      http.StatusBadRequest,
+			Description: err.Error(),
+		})
 		return
 	}
 
-	if err := deepcopier.Copy(&chatCreateDto).To(&chatModel); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error mapping chat: %v", err)})
+	if err := deepcopier.Copy(chatCreateDto).To(chatModel); err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
+			Status:      http.StatusInternalServerError,
+			Description: err.Error(),
+		})
 		return
 	}
 
-	if err := h.controller.Create(ctx, chatModel); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error creating chat: %v", err)})
+	createItemId, err := h.controller.Create(ctx, chatModel)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
+			Status:      http.StatusInternalServerError,
+			Description: err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusCreated, dto.Response{
-		Message: "Chat created successfully",
-		Data:    chatModel.Id,
-	})
+	c.JSON(http.StatusCreated, dto.CreateActionDto{Id: createItemId})
 }
 
-// Delete - godoc
-// @Summary Delete chat by ID
-// @Description delete chat
-// @Tags chats
+// Delete @Summary Delete chat by ID
+// @Tags Chats
 // @Accept json
 // @Produce json
 // @Param id path string true "Chat ID"
-// @Success 200 {object} dto.Response "Chat deleted successfully"
-// @Failure 404 {object} dto.Response
+// @Success 204 "No Content"
+// @Failure 400 {object} dto.ErrorDto
+// @Failure 404 {object} dto.ErrorDto
 // @Router /api/v1/chats/{id} [delete]
 func (h *ChatHandler) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
-
-	id, _ := uuid.Parse(c.Param("id"))
-
-	if err := h.controller.Delete(ctx, id); err != nil {
-		c.JSON(http.StatusNotFound, dto.Response{Message: "Chat not found"})
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorDto{
+			Status:      http.StatusBadRequest,
+			Description: err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.Response{Message: "Chat deleted successfully"})
+	if err := h.controller.Delete(ctx, id); err != nil {
+		c.JSON(http.StatusNotFound, dto.ErrorDto{
+			Status:      http.StatusNotFound,
+			Description: err.Error(),
+		})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
 
-// Update - godoc
-// @Summary Update chat by ID
-// @Description update chat`
-// @Tags chats
+// Update @Summary Update chat by ID
+// @Tags Chats
 // @Accept json
 // @Produce json
 // @Param id path string true "Chat ID"
 // @Param chat body dto.UpdateChatDto true "Chat info"
-// @Success 200 {object} dto.Response{data=dto.ChatDto} "Chat updated successfully"
-// @Failure 400 {object} dto.Response
-// @Failure 500 {object} dto.Response
+// @Success 204 "No Content"
+// @Failure 400 {object} dto.ErrorDto
+// @Failure 500 {object} dto.ErrorDto
 // @Router /api/v1/chats/{id} [put]
 func (h *ChatHandler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
-	chatUpdateDto := &dto.CreateChatDto{}
+	chatUpdateDto := &dto.UpdateChatDto{}
 	chatModel := &model.ChatModel{}
 
-	id, _ := uuid.Parse(c.Param("id"))
-
-	if err := c.ShouldBindJSON(&chatUpdateDto); err != nil {
-		c.JSON(http.StatusBadRequest, dto.Response{Message: fmt.Sprintf("Error decoding request body: %v", err)})
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorDto{
+			Status:      http.StatusBadRequest,
+			Description: err.Error(),
+		})
 		return
 	}
 
-	if err := deepcopier.Copy(&chatUpdateDto).To(&chatModel); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error mapping chat: %v", err)})
+	if err := c.ShouldBindJSON(chatUpdateDto); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorDto{
+			Status:      http.StatusBadRequest,
+			Description: err.Error(),
+		})
+		return
+	}
+
+	if err := deepcopier.Copy(chatUpdateDto).To(chatModel); err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
+			Status:      http.StatusInternalServerError,
+			Description: err.Error(),
+		})
 		return
 	}
 
 	if err := h.controller.Update(ctx, id, chatModel); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error updating chat: %v", err)})
+		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
+			Status:      http.StatusInternalServerError,
+			Description: err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.Response{Message: "Chat updated successfully"})
+	c.Status(http.StatusNoContent)
 }

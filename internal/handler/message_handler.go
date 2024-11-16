@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"ChatsService/internal/models/dto"
@@ -29,143 +28,179 @@ func (h *MessageHandler) ConfigureRoutes(r *gin.Engine) {
 	r.PUT("/api/v1/messages/:id", h.Update)
 }
 
-// Get - godoc
-// @Summary List messages
-// @Description get messages
-// @Tags messages
+// Get @Summary List messages
+// @Tags Messages
 // @Accept json
 // @Produce json
-// @Success 200 {object} dto.Response{data=[]dto.MessageDto} "Successful response"
-// @Failure 500 {object} dto.Response
+// @Success 200 {object} []dto.MessageDto
+// @Failure 500 {object} dto.ErrorDto
 // @Router /api/v1/messages [get]
 func (h *MessageHandler) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	messages, err := h.controller.Get(ctx)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error retrieving messages: %v", err)})
+		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
+			Status:      http.StatusInternalServerError,
+			Description: err.Error(),
+		})
 		return
 	}
-	c.JSON(http.StatusOK, dto.Response{Data: messages})
+	c.JSON(http.StatusOK, messages)
 }
 
-// GetOneById - godoc
-// @Summary Get message by ID
-// @Description get message by id
-// @Tags messages
+// GetOneById @Summary Get message by ID
+// @Tags Messages
 // @Accept json
 // @Produce json
 // @Param id path string true "Message ID"
-// @Success 200 {object} dto.Response{data=dto.MessageDto} "Successful response"
-// @Failure 404 {object} dto.Response
-// @Router /api/v1/message/{id} [get]
+// @Success 200 {object} dto.MessageDto
+// @Failure 400 {object} dto.ErrorDto
+// @Failure 404 {object} dto.ErrorDto
+// @Router /api/v1/messages/{id} [get]
 func (h *MessageHandler) GetOneById(c *gin.Context) {
 	ctx := c.Request.Context()
-
-	id, _ := uuid.Parse(c.Param("id"))
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorDto{
+			Status:      http.StatusBadRequest,
+			Description: err.Error(),
+		})
+		return
+	}
 
 	message, err := h.controller.GetOneById(ctx, id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, dto.Response{Message: "Message not found"})
+		c.JSON(http.StatusNotFound, dto.ErrorDto{
+			Status:      http.StatusNotFound,
+			Description: err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.Response{Data: message})
+	c.JSON(http.StatusOK, message)
 }
 
-// Create - godoc
-// @Summary Create a new message
-// @Description create message
-// @Tags messages
+// Create @Summary Create a new message
+// @Tags Messages
 // @Accept json
 // @Produce json
 // @Param message body dto.CreateMessageDto true "Message info"
-// @Success 201 {object} dto.Response{data=dto.MessageDto} "Message created successfully"
-// @Failure 400 {object} dto.Response
-// @Failure 500 {object} dto.Response
+// @Success 201 {object} dto.CreateActionDto
+// @Failure 400 {object} dto.ErrorDto
+// @Failure 500 {object} dto.ErrorDto
 // @Router /api/v1/messages [post]
 func (h *MessageHandler) Create(c *gin.Context) {
 	ctx := c.Request.Context()
-	messageCreateDto := &dto.UpdateMessageDto{}
+	messageCreateDto := &dto.CreateMessageDto{}
 	messageModel := &model.MessageModel{}
 
-	if err := c.ShouldBindJSON(&messageCreateDto); err != nil {
-		c.JSON(http.StatusBadRequest, dto.Response{Message: fmt.Sprintf("Error decoding request body: %v", err)})
+	if err := c.ShouldBindJSON(messageCreateDto); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorDto{
+			Status:      http.StatusBadRequest,
+			Description: err.Error(),
+		})
 		return
 	}
 
-	if err := deepcopier.Copy(&messageCreateDto).To(&messageModel); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error mapping message: %v", err)})
+	if err := deepcopier.Copy(messageCreateDto).To(messageModel); err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
+			Status:      http.StatusInternalServerError,
+			Description: err.Error(),
+		})
 		return
 	}
 
-	if err := h.controller.Create(ctx, messageModel); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error creating message: %v", err)})
+	createItemId, err := h.controller.Create(ctx, messageModel)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
+			Status:      http.StatusInternalServerError,
+			Description: err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusCreated, dto.Response{
-		Message: "Message created successfully",
-		Data:    messageModel.Id,
-	})
+	c.JSON(http.StatusCreated, dto.CreateActionDto{Id: createItemId})
 }
 
-// Delete - godoc
-// @Summary Delete message by ID
-// @Description delete message
-// @Tags messages
+// Delete @Summary Delete message by ID
+// @Tags Messages
 // @Accept json
 // @Produce json
 // @Param id path string true "Message ID"
-// @Success 200 {object} dto.Response "Message deleted successfully"
-// @Failure 404 {object} dto.Response
+// @Success 204 "No Content"
+// @Failure 400 {object} dto.ErrorDto
+// @Failure 404 {object} dto.ErrorDto
 // @Router /api/v1/messages/{id} [delete]
 func (h *MessageHandler) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
-
-	id, _ := uuid.Parse(c.Param("id"))
-
-	if err := h.controller.Delete(ctx, id); err != nil {
-		c.JSON(http.StatusNotFound, dto.Response{Message: "Message not found"})
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorDto{
+			Status:      http.StatusBadRequest,
+			Description: err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.Response{Message: "Message deleted successfully"})
+	if err := h.controller.Delete(ctx, id); err != nil {
+		c.JSON(http.StatusNotFound, dto.ErrorDto{
+			Status:      http.StatusNotFound,
+			Description: err.Error(),
+		})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
 
-// Update - godoc
-// @Summary Update message by ID
-// @Description update message`
-// @Tags messages
+// Update @Summary Update message by ID
+// @Tags Messages
 // @Accept json
 // @Produce json
 // @Param id path string true "Message ID"
 // @Param message body dto.UpdateMessageDto true "Message info"
-// @Success 200 {object} dto.Response{data=dto.MessageDto} "Message updated successfully"
-// @Failure 400 {object} dto.Response
-// @Failure 500 {object} dto.Response
+// @Success 204 "No Content"
+// @Failure 400 {object} dto.ErrorDto
+// @Failure 500 {object} dto.ErrorDto
 // @Router /api/v1/messages/{id} [put]
 func (h *MessageHandler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	messageUpdateDto := &dto.UpdateMessageDto{}
 	messageModel := &model.MessageModel{}
 
-	id, _ := uuid.Parse(c.Param("id"))
-
-	if err := c.ShouldBindJSON(&messageUpdateDto); err != nil {
-		c.JSON(http.StatusBadRequest, dto.Response{Message: fmt.Sprintf("Error decoding request body: %v", err)})
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorDto{
+			Status:      http.StatusBadRequest,
+			Description: err.Error(),
+		})
 		return
 	}
 
-	if err := deepcopier.Copy(&messageUpdateDto).To(&messageModel); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error mapping message: %v", err)})
+	if err := c.ShouldBindJSON(messageUpdateDto); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorDto{
+			Status:      http.StatusBadRequest,
+			Description: err.Error(),
+		})
+		return
+	}
+
+	if err := deepcopier.Copy(messageUpdateDto).To(messageModel); err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
+			Status:      http.StatusInternalServerError,
+			Description: err.Error(),
+		})
 		return
 	}
 
 	if err := h.controller.Update(ctx, id, messageModel); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.Response{Message: fmt.Sprintf("Error updating message: %v", err)})
+		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
+			Status:      http.StatusInternalServerError,
+			Description: err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.Response{Message: "Message updated successfully"})
+	c.Status(http.StatusNoContent)
 }

@@ -15,59 +15,8 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/chat/{id}": {
-            "get": {
-                "description": "get chat by id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "chats"
-                ],
-                "summary": "Get chat by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Chat ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/dto.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.ChatDto"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/chats": {
             "get": {
-                "description": "get chats",
                 "consumes": [
                     "application/json"
                 ],
@@ -75,41 +24,27 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "chats"
+                    "Chats"
                 ],
-                "summary": "List chats",
                 "responses": {
                     "200": {
-                        "description": "Successful response",
+                        "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/dto.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/dto.ChatDto"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.ChatDto"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response"
+                            "$ref": "#/definitions/dto.ErrorDto"
                         }
                     }
                 }
             },
             "post": {
-                "description": "create chat",
                 "consumes": [
                     "application/json"
                 ],
@@ -117,9 +52,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "chats"
+                    "Chats"
                 ],
-                "summary": "Create a new chat",
                 "parameters": [
                     {
                         "description": "Chat info",
@@ -133,41 +67,28 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Chat created successfully",
+                        "description": "Created",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/dto.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.ChatDto"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/dto.CreateActionDto"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response"
+                            "$ref": "#/definitions/dto.ErrorDto"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response"
+                            "$ref": "#/definitions/dto.ErrorDto"
                         }
                     }
                 }
             }
         },
         "/api/v1/chats/{id}": {
-            "put": {
-                "description": "update chat` + "`" + `",
+            "get": {
                 "consumes": [
                     "application/json"
                 ],
@@ -175,9 +96,48 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "chats"
+                    "Chats"
                 ],
-                "summary": "Update chat by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chat ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ChatDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDto"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDto"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chats"
+                ],
                 "parameters": [
                     {
                         "type": "string",
@@ -197,40 +157,24 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Chat updated successfully",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/dto.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.ChatDto"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response"
+                            "$ref": "#/definitions/dto.ErrorDto"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response"
+                            "$ref": "#/definitions/dto.ErrorDto"
                         }
                     }
                 }
             },
             "delete": {
-                "description": "delete chat",
                 "consumes": [
                     "application/json"
                 ],
@@ -238,9 +182,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "chats"
+                    "Chats"
                 ],
-                "summary": "Delete chat by ID",
                 "parameters": [
                     {
                         "type": "string",
@@ -251,66 +194,19 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Chat deleted successfully",
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response"
+                            "$ref": "#/definitions/dto.ErrorDto"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/message/{id}": {
-            "get": {
-                "description": "get message by id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "messages"
-                ],
-                "summary": "Get message by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Message ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/dto.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.MessageDto"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Response"
+                            "$ref": "#/definitions/dto.ErrorDto"
                         }
                     }
                 }
@@ -318,7 +214,6 @@ const docTemplate = `{
         },
         "/api/v1/messages": {
             "get": {
-                "description": "get messages",
                 "consumes": [
                     "application/json"
                 ],
@@ -326,41 +221,27 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "messages"
+                    "Messages"
                 ],
-                "summary": "List messages",
                 "responses": {
                     "200": {
-                        "description": "Successful response",
+                        "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/dto.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/dto.MessageDto"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.MessageDto"
+                            }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response"
+                            "$ref": "#/definitions/dto.ErrorDto"
                         }
                     }
                 }
             },
             "post": {
-                "description": "create message",
                 "consumes": [
                     "application/json"
                 ],
@@ -368,9 +249,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "messages"
+                    "Messages"
                 ],
-                "summary": "Create a new message",
                 "parameters": [
                     {
                         "description": "Message info",
@@ -384,41 +264,28 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Message created successfully",
+                        "description": "Created",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/dto.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.MessageDto"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/dto.CreateActionDto"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response"
+                            "$ref": "#/definitions/dto.ErrorDto"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response"
+                            "$ref": "#/definitions/dto.ErrorDto"
                         }
                     }
                 }
             }
         },
         "/api/v1/messages/{id}": {
-            "put": {
-                "description": "update message` + "`" + `",
+            "get": {
                 "consumes": [
                     "application/json"
                 ],
@@ -426,9 +293,48 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "messages"
+                    "Messages"
                 ],
-                "summary": "Update message by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Message ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.MessageDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDto"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDto"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Messages"
+                ],
                 "parameters": [
                     {
                         "type": "string",
@@ -448,40 +354,24 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Message updated successfully",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/dto.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.MessageDto"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response"
+                            "$ref": "#/definitions/dto.ErrorDto"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response"
+                            "$ref": "#/definitions/dto.ErrorDto"
                         }
                     }
                 }
             },
             "delete": {
-                "description": "delete message",
                 "consumes": [
                     "application/json"
                 ],
@@ -489,9 +379,8 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "messages"
+                    "Messages"
                 ],
-                "summary": "Delete message by ID",
                 "parameters": [
                     {
                         "type": "string",
@@ -502,16 +391,19 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Message deleted successfully",
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response"
+                            "$ref": "#/definitions/dto.ErrorDto"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response"
+                            "$ref": "#/definitions/dto.ErrorDto"
                         }
                     }
                 }
@@ -521,6 +413,10 @@ const docTemplate = `{
     "definitions": {
         "dto.ChatDto": {
             "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
             "properties": {
                 "id": {
                     "type": "string"
@@ -530,16 +426,30 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.CreateActionDto": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.CreateChatDto": {
             "type": "object",
+            "required": [
+                "name"
+            ],
             "properties": {
-                "employeesIds": {
+                "employee_ids": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
                 },
-                "isGroup": {
+                "is_group": {
                     "type": "boolean"
                 },
                 "name": {
@@ -549,14 +459,20 @@ const docTemplate = `{
         },
         "dto.CreateMessageDto": {
             "type": "object",
+            "required": [
+                "chat_id",
+                "colleague_id",
+                "employee_id",
+                "text"
+            ],
             "properties": {
-                "chatId": {
+                "chat_id": {
                     "type": "string"
                 },
                 "colleague_id": {
                     "type": "string"
                 },
-                "employeeId": {
+                "employee_id": {
                     "type": "string"
                 },
                 "text": {
@@ -564,10 +480,33 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.ErrorDto": {
+            "type": "object",
+            "required": [
+                "description",
+                "status"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.MessageDto": {
             "type": "object",
+            "required": [
+                "chat_id",
+                "colleague_id",
+                "created_at",
+                "employee_id",
+                "id",
+                "text"
+            ],
             "properties": {
-                "chatId": {
+                "chat_id": {
                     "type": "string"
                 },
                 "colleague_id": {
@@ -576,7 +515,7 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
-                "employeeId": {
+                "employee_id": {
                     "type": "string"
                 },
                 "id": {
@@ -587,19 +526,14 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.Response": {
-            "type": "object",
-            "properties": {
-                "data": {},
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.UpdateChatDto": {
             "type": "object",
+            "required": [
+                "employee_ids",
+                "name"
+            ],
             "properties": {
-                "employeesIds": {
+                "employee_ids": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -612,6 +546,9 @@ const docTemplate = `{
         },
         "dto.UpdateMessageDto": {
             "type": "object",
+            "required": [
+                "text"
+            ],
             "properties": {
                 "text": {
                     "type": "string"
@@ -631,6 +568,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
+	LeftDelim:        "{{",
+	RightDelim:       "}}",
 }
 
 func init() {

@@ -7,10 +7,10 @@ import (
 )
 
 type MessageDto struct {
-	Id          uuid.UUID `json:"id"`
-	ChatId      uuid.UUID `json:"chatId"`
-	EmployeeId  uuid.UUID `json:"employeeId"`
-	ColleagueId uuid.UUID `json:"colleague_id"`
-	Text        string    `json:"text"`
-	CreatedAt   time.Time `json:"created_at"`
+	Id          uuid.UUID `json:"id" binding:"required"`
+	ChatId      uuid.UUID `json:"chat_id" binding:"required"`
+	EmployeeId  uuid.UUID `json:"employee_id" binding:"required"`
+	ColleagueId uuid.UUID `json:"colleague_id" binding:"required"`
+	Text        string    `json:"text" binding:"required"`
+	CreatedAt   time.Time `json:"created_at" binding:"required"`
 }
