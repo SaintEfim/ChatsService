@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 
 	"ChatsService/internal/models/entity"
@@ -34,8 +35,43 @@ func NewChatRepository(db *sqlx.DB) interfaces.Repository[entity.ChatEntity] {
 func (r *ChatRepository) Get(ctx context.Context) ([]*entity.ChatEntity, error) {
 	chats := make([]*entity.ChatEntity, 0)
 
-	err := r.db.SelectContext(ctx, &chats, retrieveAllChats)
+	rows, err := r.db.QueryxContext(ctx, retrieveAllChats)
 	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var chat entity.ChatEntity
+		var rawEmployeeIDs []byte
+
+		err := rows.Scan(&chat.Id, &chat.Name, &chat.IsGroup, &rawEmployeeIDs)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(rawEmployeeIDs) > 0 {
+			var employeeIds []string
+			err = json.Unmarshal(rawEmployeeIDs, &employeeIds)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, empId := range employeeIds {
+				uuidValue, err := uuid.Parse(empId)
+				if err != nil {
+					return nil, err
+				}
+				chat.EmployeeIds = append(chat.EmployeeIds, uuidValue)
+			}
+		} else {
+			chat.EmployeeIds = make([]uuid.UUID, 0)
+		}
+
+		chats = append(chats, &chat)
+	}
+
+	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 

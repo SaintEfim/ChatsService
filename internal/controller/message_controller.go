@@ -1,14 +1,13 @@
 package controller
 
 import (
-	"context"
-
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
 	"ChatsService/internal/models/model"
+	"context"
 
 	"github.com/google/uuid"
-	"github.com/ulule/deepcopier"
+	"github.com/stroiman/go-automapper"
 )
 
 type MessageController struct {
@@ -27,9 +26,7 @@ func (c *MessageController) Get(ctx context.Context) ([]*model.MessageModel, err
 		return nil, err
 	}
 
-	if err := deepcopier.Copy(messages).To(messageModels); err != nil {
-		return nil, err
-	}
+	automapper.MapLoose(messages, &messageModels)
 
 	return messageModels, nil
 }
@@ -42,9 +39,7 @@ func (c *MessageController) GetOneById(ctx context.Context, id uuid.UUID) (*mode
 		return nil, err
 	}
 
-	if err := deepcopier.Copy(message).To(messageModel); err != nil {
-		return nil, err
-	}
+	automapper.MapLoose(message, messageModel)
 
 	return messageModel, nil
 }
@@ -52,9 +47,7 @@ func (c *MessageController) GetOneById(ctx context.Context, id uuid.UUID) (*mode
 func (c *MessageController) Create(ctx context.Context, message *model.MessageModel) (uuid.UUID, error) {
 	messageEntity := &entity.MessageEntity{}
 
-	if err := deepcopier.Copy(message).To(messageEntity); err != nil {
-		return uuid.Nil, err
-	}
+	automapper.MapLoose(message, messageEntity)
 
 	createItemId, err := c.rep.Create(ctx, messageEntity)
 	if err != nil {
@@ -76,9 +69,7 @@ func (c *MessageController) Delete(ctx context.Context, id uuid.UUID) error {
 func (c *MessageController) Update(ctx context.Context, id uuid.UUID, message *model.MessageModel) error {
 	messageEntity := &entity.MessageEntity{}
 
-	if err := deepcopier.Copy(message).To(messageEntity); err != nil {
-		return err
-	}
+	automapper.MapLoose(message, messageEntity)
 
 	err := c.rep.Update(ctx, id, messageEntity)
 	if err != nil {

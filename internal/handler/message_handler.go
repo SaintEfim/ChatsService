@@ -9,7 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/ulule/deepcopier"
+	"github.com/stroiman/go-automapper"
 )
 
 type MessageHandler struct {
@@ -103,13 +103,7 @@ func (h *MessageHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if err := deepcopier.Copy(messageCreateDto).To(messageModel); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
-			Status:      http.StatusInternalServerError,
-			Description: err.Error(),
-		})
-		return
-	}
+	automapper.MapLoose(messageCreateDto, messageModel)
 
 	createItemId, err := h.controller.Create(ctx, messageModel)
 	if err != nil {
@@ -186,13 +180,7 @@ func (h *MessageHandler) Update(c *gin.Context) {
 		return
 	}
 
-	if err := deepcopier.Copy(messageUpdateDto).To(messageModel); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
-			Status:      http.StatusInternalServerError,
-			Description: err.Error(),
-		})
-		return
-	}
+	automapper.MapLoose(messageUpdateDto, messageModel)
 
 	if err := h.controller.Update(ctx, id, messageModel); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorDto{

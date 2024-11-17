@@ -3,7 +3,7 @@ CREATE TABLE Chats
     id           UUID PRIMARY KEY,
     name         VARCHAR(255) NOT NULL,
     is_group     BOOLEAN      NOT NULL DEFAULT FALSE,
-    employee_ids UUID[]       DEFAULT ARRAY[]::UUID[],
+    employee_ids UUID[],
     created_at   TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at   TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

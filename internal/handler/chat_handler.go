@@ -9,7 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/ulule/deepcopier"
+	"github.com/stroiman/go-automapper"
 )
 
 type ChatHandler struct {
@@ -36,6 +36,7 @@ func (h *ChatHandler) ConfigureRoutes(r *gin.Engine) {
 // @Failure 500 {object} dto.ErrorDto
 // @Router /api/v1/chats [get]
 func (h *ChatHandler) Get(c *gin.Context) {
+	chatDtos := make([]dto.ChatDto, 0)
 	ctx := c.Request.Context()
 
 	chats, err := h.controller.Get(ctx)
@@ -46,7 +47,10 @@ func (h *ChatHandler) Get(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, chats)
+
+	automapper.MapLoose(chats, &chatDtos)
+
+	c.JSON(http.StatusOK, chatDtos)
 }
 
 // GetOneById @Summary Get chat by ID
@@ -59,7 +63,9 @@ func (h *ChatHandler) Get(c *gin.Context) {
 // @Failure 404 {object} dto.ErrorDto
 // @Router /api/v1/chats/{id} [get]
 func (h *ChatHandler) GetOneById(c *gin.Context) {
+	chatDto := &dto.ChatDto{}
 	ctx := c.Request.Context()
+
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorDto{
@@ -78,6 +84,8 @@ func (h *ChatHandler) GetOneById(c *gin.Context) {
 		return
 	}
 
+	automapper.MapLoose(chat, chatDto)
+
 	c.JSON(http.StatusOK, chat)
 }
 
@@ -91,9 +99,9 @@ func (h *ChatHandler) GetOneById(c *gin.Context) {
 // @Failure 500 {object} dto.ErrorDto
 // @Router /api/v1/chats [post]
 func (h *ChatHandler) Create(c *gin.Context) {
-	ctx := c.Request.Context()
 	chatCreateDto := &dto.CreateChatDto{}
 	chatModel := &model.ChatModel{}
+	ctx := c.Request.Context()
 
 	if err := c.ShouldBindJSON(chatCreateDto); err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorDto{
@@ -103,14 +111,7 @@ func (h *ChatHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if err := deepcopier.Copy(chatCreateDto).To(chatModel); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
-			Status:      http.StatusInternalServerError,
-			Description: err.Error(),
-		})
-		return
-	}
-
+	automapper.MapLoose(chatCreateDto, chatModel)
 	createItemId, err := h.controller.Create(ctx, chatModel)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
@@ -178,7 +179,7 @@ func (h *ChatHandler) Update(c *gin.Context) {
 		return
 	}
 
-	if err := c.ShouldBindJSON(chatUpdateDto); err != nil {
+	if err := c.ShouldBindJSON(&chatUpdateDto); err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorDto{
 			Status:      http.StatusBadRequest,
 			Description: err.Error(),
@@ -186,13 +187,7 @@ func (h *ChatHandler) Update(c *gin.Context) {
 		return
 	}
 
-	if err := deepcopier.Copy(chatUpdateDto).To(chatModel); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
-			Status:      http.StatusInternalServerError,
-			Description: err.Error(),
-		})
-		return
-	}
+	automapper.MapLoose(chatUpdateDto, chatModel)
 
 	if err := h.controller.Update(ctx, id, chatModel); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
