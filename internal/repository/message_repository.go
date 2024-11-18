@@ -13,11 +13,11 @@ import (
 )
 
 const (
-	retrieveAllMessages = `SELECT id, chat_id, employee_id, colleague_id, text FROM messages`
-	retrieveMessageById = `SELECT id, chat_id, employee_id, colleague_id, text FROM messages WHERE id = $1`
-	createMessage       = `INSERT INTO messages (id, chat_id, employeeId, colleague_id, text, created_at, updated_at) VALUES ($1, $2, $3, $4, NOW(), NOW())`
-	deleteMessage       = `DELETE FROM messages WHERE id = $1`
-	updateMessage       = `UPDATE messages SET text = $1, updated_at = NOW() WHERE id = $2`
+	getAllMessages = `SELECT id, chat_id, employee_id, colleague_id, text FROM messages`
+	getMessageById = `SELECT id, chat_id, employee_id, colleague_id, text FROM messages WHERE id = $1`
+	createMessage  = `INSERT INTO messages (id, chat_id, employeeId, colleague_id, text, created_at, updated_at) VALUES ($1, $2, $3, $4, NOW(), NOW())`
+	deleteMessage  = `DELETE FROM messages WHERE id = $1`
+	updateMessage  = `UPDATE messages SET text = $1, updated_at = NOW() WHERE id = $2`
 )
 
 type MessageRepository struct {
@@ -31,7 +31,7 @@ func NewMessageRepository(db *sqlx.DB) interfaces.Repository[entity.MessageEntit
 func (r *MessageRepository) Get(ctx context.Context) ([]*entity.MessageEntity, error) {
 	messages := make([]*entity.MessageEntity, 0)
 
-	err := r.db.SelectContext(ctx, &messages, retrieveAllMessages)
+	err := r.db.SelectContext(ctx, &messages, getAllMessages)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (r *MessageRepository) Get(ctx context.Context) ([]*entity.MessageEntity, e
 func (r *MessageRepository) GetOneById(ctx context.Context, id uuid.UUID) (*entity.MessageEntity, error) {
 	message := &entity.MessageEntity{}
 
-	if err := r.db.GetContext(ctx, &message, retrieveMessageById, id); err != nil {
+	if err := r.db.GetContext(ctx, &message, getMessageById, id); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, err
 		}
