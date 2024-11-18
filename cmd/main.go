@@ -5,9 +5,9 @@ import (
 
 	"ChatsService/config"
 	"ChatsService/internal/controller"
-	"ChatsService/internal/database/psql"
 	"ChatsService/internal/handler"
 	"ChatsService/internal/models/interfaces"
+	"ChatsService/internal/psql_database/connect"
 	"ChatsService/internal/repository"
 	"ChatsService/internal/server"
 	"ChatsService/pkg/logger"
@@ -70,7 +70,7 @@ func main() {
 			controller.NewMessageController,
 			handler.NewChatHandler,
 			handler.NewMessageHandler,
-			psql.PostgresConnect,
+			connect.PostgresConnect,
 			server.NewHTTPServer,
 			server.NewServer,
 		),

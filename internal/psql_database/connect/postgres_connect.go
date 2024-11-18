@@ -1,4 +1,4 @@
-package psql
+package connect
 
 import (
 	"context"

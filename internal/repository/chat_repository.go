@@ -6,25 +6,17 @@ import (
 
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
+	"ChatsService/internal/psql_database/query"
 
 	"github.com/google/uuid"
-	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 )
 
-const (
-	getAllChats = `SELECT id, name, is_group, employee_ids FROM chats`
-	getChatById = `SELECT id, name, is_group, employee_ids FROM chats WHERE id = $1`
-	createChat  = `INSERT INTO chats (id, name, is_group, employee_ids, created_at, updated_at) VALUES ($1, $2, $3, $4, NOW(), NOW())`
-	deleteChat  = `DELETE FROM chats WHERE id = $1`
-	updateChat  = `UPDATE chats SET name = $1, employee_ids = $2, updated_at = NOW() WHERE id = $3`
-)
-
 type ChatRepository struct {
-	db *sqlx.DB
+	db interfaces.QueryExecutor
 }
 
-func NewChatRepository(db *sqlx.DB) interfaces.Repository[entity.ChatEntity] {
+func NewChatRepository(db interfaces.QueryExecutor) interfaces.Repository[entity.ChatEntity] {
 	return &ChatRepository{
 		db: db,
 	}
@@ -33,7 +25,7 @@ func NewChatRepository(db *sqlx.DB) interfaces.Repository[entity.ChatEntity] {
 func (r *ChatRepository) Get(ctx context.Context) ([]*entity.ChatEntity, error) {
 	chats := make([]*entity.ChatEntity, 0)
 
-	rows, err := r.db.QueryContext(ctx, getAllChats)
+	rows, err := r.db.QueryContext(ctx, query.GetAllChats)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +57,7 @@ func (r *ChatRepository) Get(ctx context.Context) ([]*entity.ChatEntity, error) 
 func (r *ChatRepository) GetOneById(ctx context.Context, id uuid.UUID) (*entity.ChatEntity, error) {
 	chat := &entity.ChatEntity{}
 
-	rows, err := r.db.QueryContext(ctx, getChatById, id)
+	rows, err := r.db.QueryContext(ctx, query.GetChatById, id)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +91,7 @@ func (r *ChatRepository) Create(ctx context.Context, chat *entity.ChatEntity) (u
 		chat.EmployeeIds = make([]uuid.UUID, 0)
 	}
 
-	_, err := r.db.ExecContext(ctx, createChat,
+	_, err := r.db.ExecContext(ctx, query.CreateChat,
 		chat.Id,
 		chat.Name,
 		chat.IsGroup,
@@ -112,7 +104,7 @@ func (r *ChatRepository) Create(ctx context.Context, chat *entity.ChatEntity) (u
 }
 
 func (r *ChatRepository) Delete(ctx context.Context, id uuid.UUID) error {
-	result, err := r.db.ExecContext(ctx, deleteChat, id)
+	result, err := r.db.ExecContext(ctx, query.DeleteChat, id)
 	if err != nil {
 		return err
 	}
@@ -134,7 +126,7 @@ func (r *ChatRepository) Update(ctx context.Context, id uuid.UUID, chat *entity.
 		chat.EmployeeIds = make([]uuid.UUID, 0)
 	}
 
-	result, err := r.db.ExecContext(ctx, updateChat,
+	result, err := r.db.ExecContext(ctx, query.UpdateChat,
 		chat.Name,
 		pq.Array(chat.EmployeeIds),
 		id)
