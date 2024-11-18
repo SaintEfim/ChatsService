@@ -130,9 +130,13 @@ func (r *ChatRepository) Delete(ctx context.Context, id uuid.UUID) error {
 }
 
 func (r *ChatRepository) Update(ctx context.Context, id uuid.UUID, chat *entity.ChatEntity) error {
+	if chat.EmployeeIds == nil {
+		chat.EmployeeIds = make([]uuid.UUID, 0)
+	}
+
 	result, err := r.db.ExecContext(ctx, updateChat,
-		&chat.Name,
-		pq.Array(&chat.EmployeeIds),
+		chat.Name,
+		pq.Array(chat.EmployeeIds),
 		id)
 	if err != nil {
 		return err
