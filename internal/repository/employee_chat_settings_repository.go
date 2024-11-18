@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"errors"
 
+	"ChatsService/internal/database/postgres/query"
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
-	"ChatsService/internal/psql_database/query"
 
 	"github.com/google/uuid"
 )

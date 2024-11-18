@@ -1,14 +1,14 @@
 package main
 
 import (
+	"ChatsService/internal/database/postgres/executor"
+	"ChatsService/internal/database/postgres/repository"
 	"context"
 
 	"ChatsService/config"
 	"ChatsService/internal/controller"
 	"ChatsService/internal/handler"
 	"ChatsService/internal/models/interfaces"
-	"ChatsService/internal/psql_database/connect"
-	"ChatsService/internal/repository"
 	"ChatsService/internal/server"
 	"ChatsService/pkg/logger"
 
@@ -63,14 +63,15 @@ func main() {
 		}),
 		fx.Provide(
 			logger.NewLogger,
-			repository.NewChatRepository,
-			repository.NewMessageRepository,
-			repository.NewEmployeeChatSettingsRepository,
+			repository.NewPostgresChatRepository,
+			repository.NewPostgresMessageRepository,
+			repository.NewPostgresEmployeeChatSettingsRepository,
+			executor.NewSQLXExecutor,
+			executor.PostgresConnect,
 			controller.NewChatController,
 			controller.NewMessageController,
 			handler.NewChatHandler,
 			handler.NewMessageHandler,
-			connect.PostgresConnect,
 			server.NewHTTPServer,
 			server.NewServer,
 		),

@@ -5,6 +5,7 @@ import (
 
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
+	"ChatsService/internal/repository"
 
 	"github.com/google/uuid"
 )
@@ -13,8 +14,9 @@ type PostgresChatRepository struct {
 	repo interfaces.Repository[entity.ChatEntity]
 }
 
-func NewPostgresChatRepository(repo interfaces.Repository[entity.ChatEntity]) interfaces.Repository[entity.ChatEntity] {
-	return &PostgresChatRepository{repo: repo}
+func NewPostgresChatRepository(exec interfaces.QueryExecutor) interfaces.Repository[entity.ChatEntity] {
+	baseRepo := repository.NewChatRepository(exec)
+	return &PostgresChatRepository{repo: baseRepo}
 }
 
 func (r *PostgresChatRepository) Get(ctx context.Context) ([]*entity.ChatEntity, error) {
