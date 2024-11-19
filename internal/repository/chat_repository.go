@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"ChatsService/internal/database/postgres/query"
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
 
@@ -13,19 +12,21 @@ import (
 )
 
 type ChatRepository struct {
-	db interfaces.QueryExecutor
+	db    interfaces.QueryExecutor
+	query interfaces.Query[entity.ChatEntity]
 }
 
-func NewChatRepository(db interfaces.QueryExecutor) interfaces.Repository[entity.ChatEntity] {
+func NewChatRepository(db interfaces.QueryExecutor, query interfaces.Query[entity.ChatEntity]) interfaces.Repository[entity.ChatEntity] {
 	return &ChatRepository{
-		db: db,
+		db:    db,
+		query: query,
 	}
 }
 
 func (r *ChatRepository) Get(ctx context.Context) ([]*entity.ChatEntity, error) {
 	chats := make([]*entity.ChatEntity, 0)
 
-	rows, err := r.db.QueryContext(ctx, query.GetAllChats)
+	rows, err := r.db.QueryContext(ctx, r.query.Get())
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +58,7 @@ func (r *ChatRepository) Get(ctx context.Context) ([]*entity.ChatEntity, error) 
 func (r *ChatRepository) GetOneById(ctx context.Context, id uuid.UUID) (*entity.ChatEntity, error) {
 	chat := &entity.ChatEntity{}
 
-	rows, err := r.db.QueryContext(ctx, query.GetChatById, id)
+	rows, err := r.db.QueryContext(ctx, r.query.GetOneById(), id)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +92,7 @@ func (r *ChatRepository) Create(ctx context.Context, chat *entity.ChatEntity) (u
 		chat.EmployeeIds = make([]uuid.UUID, 0)
 	}
 
-	_, err := r.db.ExecContext(ctx, query.CreateChat,
+	_, err := r.db.ExecContext(ctx, r.query.Create(),
 		chat.Id,
 		chat.Name,
 		chat.IsGroup,
@@ -104,7 +105,7 @@ func (r *ChatRepository) Create(ctx context.Context, chat *entity.ChatEntity) (u
 }
 
 func (r *ChatRepository) Delete(ctx context.Context, id uuid.UUID) error {
-	result, err := r.db.ExecContext(ctx, query.DeleteChat, id)
+	result, err := r.db.ExecContext(ctx, r.query.Delete(), id)
 	if err != nil {
 		return err
 	}
@@ -126,7 +127,7 @@ func (r *ChatRepository) Update(ctx context.Context, id uuid.UUID, chat *entity.
 		chat.EmployeeIds = make([]uuid.UUID, 0)
 	}
 
-	result, err := r.db.ExecContext(ctx, query.UpdateChat,
+	result, err := r.db.ExecContext(ctx, r.query.Update(),
 		chat.Name,
 		pq.Array(chat.EmployeeIds),
 		id)

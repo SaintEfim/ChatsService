@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 
-	"ChatsService/internal/database/postgres/query"
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
 
@@ -13,17 +12,20 @@ import (
 )
 
 type MessageRepository struct {
-	db interfaces.QueryExecutor
+	db    interfaces.QueryExecutor
+	query interfaces.Query[entity.MessageEntity]
 }
 
-func NewMessageRepository(db interfaces.QueryExecutor) interfaces.Repository[entity.MessageEntity] {
-	return &MessageRepository{db: db}
+func NewMessageRepository(db interfaces.QueryExecutor, query interfaces.Query[entity.MessageEntity]) interfaces.Repository[entity.MessageEntity] {
+	return &MessageRepository{
+		db:    db,
+		query: query}
 }
 
 func (r *MessageRepository) Get(ctx context.Context) ([]*entity.MessageEntity, error) {
 	messages := make([]*entity.MessageEntity, 0)
 
-	err := r.db.SelectContext(ctx, &messages, query.GetAllMessages)
+	err := r.db.SelectContext(ctx, &messages, r.query.Get())
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +36,7 @@ func (r *MessageRepository) Get(ctx context.Context) ([]*entity.MessageEntity, e
 func (r *MessageRepository) GetOneById(ctx context.Context, id uuid.UUID) (*entity.MessageEntity, error) {
 	message := &entity.MessageEntity{}
 
-	if err := r.db.GetContext(ctx, &message, query.GetMessageById, id); err != nil {
+	if err := r.db.GetContext(ctx, &message, r.query.GetOneById(), id); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, err
 		}
@@ -47,7 +49,7 @@ func (r *MessageRepository) GetOneById(ctx context.Context, id uuid.UUID) (*enti
 func (r *MessageRepository) Create(ctx context.Context, message *entity.MessageEntity) (uuid.UUID, error) {
 	message.Id = uuid.New()
 
-	_, err := r.db.ExecContext(ctx, query.CreateMessage,
+	_, err := r.db.ExecContext(ctx, r.query.Create(),
 		message.Id,
 		message.ChatId,
 		message.EmployeeId,
@@ -60,7 +62,7 @@ func (r *MessageRepository) Create(ctx context.Context, message *entity.MessageE
 }
 
 func (r *MessageRepository) Delete(ctx context.Context, id uuid.UUID) error {
-	result, err := r.db.ExecContext(ctx, query.DeleteMessage, id)
+	result, err := r.db.ExecContext(ctx, r.query.Delete(), id)
 	if err != nil {
 		return err
 	}
@@ -78,7 +80,7 @@ func (r *MessageRepository) Delete(ctx context.Context, id uuid.UUID) error {
 }
 
 func (r *MessageRepository) Update(ctx context.Context, id uuid.UUID, message *entity.MessageEntity) error {
-	result, err := r.db.ExecContext(ctx, query.UpdateMessage,
+	result, err := r.db.ExecContext(ctx, r.query.Update(),
 		message.Text,
 		id)
 	if err != nil {

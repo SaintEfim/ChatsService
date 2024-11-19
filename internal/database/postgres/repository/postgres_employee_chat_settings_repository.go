@@ -9,11 +9,12 @@ import (
 )
 
 type PostgresEmployeeChatSettingsRepository struct {
-	repo interfaces.Repository[entity.EmployeeChatSettingsEntity]
+	repo  interfaces.Repository[entity.EmployeeChatSettingsEntity]
+	query interfaces.Query[entity.EmployeeChatSettingsEntity]
 }
 
-func NewPostgresEmployeeChatSettingsRepository(exec interfaces.QueryExecutor) interfaces.Repository[entity.EmployeeChatSettingsEntity] {
-	baseRepo := repository.NewEmployeeChatSettingsRepository(exec)
+func NewPostgresEmployeeChatSettingsRepository(exec interfaces.QueryExecutor, query interfaces.Query[entity.EmployeeChatSettingsEntity]) interfaces.Repository[entity.EmployeeChatSettingsEntity] {
+	baseRepo := repository.NewEmployeeChatSettingsRepository(exec, query)
 	return &PostgresEmployeeChatSettingsRepository{repo: baseRepo}
 }
 
