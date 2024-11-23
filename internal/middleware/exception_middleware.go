@@ -50,7 +50,7 @@ func ExceptionMiddleware(logger *zap.Logger) gin.HandlerFunc {
 }
 
 func getStacktrace() string {
-	if gin.Mode() == "Development" {
+	if gin.Mode() == "debug" {
 		return string(debug.Stack())
 	}
 
