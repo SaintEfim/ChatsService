@@ -11,11 +11,12 @@ import (
 )
 
 type PostgresChatRepository struct {
-	repo interfaces.Repository[entity.ChatEntity]
+	repo  interfaces.Repository[entity.ChatEntity]
+	query interfaces.Query[entity.ChatEntity]
 }
 
-func NewPostgresChatRepository(exec interfaces.QueryExecutor) interfaces.Repository[entity.ChatEntity] {
-	baseRepo := repository.NewChatRepository(exec)
+func NewPostgresChatRepository(exec interfaces.QueryExecutor, query interfaces.Query[entity.ChatEntity]) interfaces.Repository[entity.ChatEntity] {
+	baseRepo := repository.NewChatRepository(exec, query)
 	return &PostgresChatRepository{repo: baseRepo}
 }
 

@@ -1,12 +1,14 @@
 package middleware
 
 import (
-	"ChatsService/internal/exception"
-	"ChatsService/internal/models/dto"
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"net/http"
 	"runtime/debug"
+
+	"ChatsService/internal/exception"
+	"ChatsService/internal/models/dto"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func ExceptionMiddleware(logger *zap.Logger) gin.HandlerFunc {

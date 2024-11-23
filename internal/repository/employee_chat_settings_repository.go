@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"ChatsService/internal/database/postgres/query"
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
 
@@ -15,19 +14,21 @@ import (
 )
 
 type EmployeeChatSettingsRepository struct {
-	db interfaces.QueryExecutor
+	db    interfaces.QueryExecutor
+	query interfaces.Query[entity.EmployeeChatSettingsEntity]
 }
 
-func NewEmployeeChatSettingsRepository(db interfaces.QueryExecutor) interfaces.Repository[entity.EmployeeChatSettingsEntity] {
+func NewEmployeeChatSettingsRepository(db interfaces.QueryExecutor, query interfaces.Query[entity.EmployeeChatSettingsEntity]) interfaces.Repository[entity.EmployeeChatSettingsEntity] {
 	return &EmployeeChatSettingsRepository{
-		db: db,
+		db:    db,
+		query: query,
 	}
 }
 
 func (r *EmployeeChatSettingsRepository) Get(ctx context.Context) ([]*entity.EmployeeChatSettingsEntity, error) {
 	employeeChatSettings := make([]*entity.EmployeeChatSettingsEntity, 0)
 
-	err := r.db.SelectContext(ctx, &employeeChatSettings, query.GetAllEmployeeChatSettings)
+	err := r.db.SelectContext(ctx, &employeeChatSettings, r.query.Get())
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +39,7 @@ func (r *EmployeeChatSettingsRepository) Get(ctx context.Context) ([]*entity.Emp
 func (r *EmployeeChatSettingsRepository) GetOneById(ctx context.Context, id uuid.UUID) (*entity.EmployeeChatSettingsEntity, error) {
 	employeeChatSettings := &entity.EmployeeChatSettingsEntity{}
 
-	if err := r.db.GetContext(ctx, &employeeChatSettings, query.GetEmployeeChatSettingsById, id); err != nil {
+	if err := r.db.GetContext(ctx, &employeeChatSettings, r.query.Get(), id); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, err
 		}
@@ -55,7 +56,7 @@ func (r *EmployeeChatSettingsRepository) GetOneById(ctx context.Context, id uuid
 func (r *EmployeeChatSettingsRepository) Create(ctx context.Context, employeeChatSettings *entity.EmployeeChatSettingsEntity) (uuid.UUID, error) {
 	employeeChatSettings.Id = uuid.New()
 
-	_, err := r.db.ExecContext(ctx, query.CreateEmployeeChatSettings,
+	_, err := r.db.ExecContext(ctx, r.query.Create(),
 		employeeChatSettings.Id,
 		employeeChatSettings.ChatId,
 		employeeChatSettings.EmployeeId,
@@ -68,7 +69,7 @@ func (r *EmployeeChatSettingsRepository) Create(ctx context.Context, employeeCha
 }
 
 func (r *EmployeeChatSettingsRepository) Delete(ctx context.Context, id uuid.UUID) error {
-	result, err := r.db.ExecContext(ctx, query.DeleteEmployeeChatSettings, id)
+	result, err := r.db.ExecContext(ctx, r.query.Delete(), id)
 	if err != nil {
 		return err
 	}
@@ -86,7 +87,7 @@ func (r *EmployeeChatSettingsRepository) Delete(ctx context.Context, id uuid.UUI
 }
 
 func (r *EmployeeChatSettingsRepository) Update(ctx context.Context, id uuid.UUID, employeeChatSettings *entity.EmployeeChatSettingsEntity) error {
-	result, err := r.db.ExecContext(ctx, query.UpdateEmployeeChatSettings,
+	result, err := r.db.ExecContext(ctx, r.query.Update(),
 		employeeChatSettings.DisplayName,
 		id)
 	if err != nil {

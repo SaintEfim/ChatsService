@@ -9,11 +9,12 @@ import (
 )
 
 type PostgresMessageRepository struct {
-	repo interfaces.Repository[entity.MessageEntity]
+	repo  interfaces.Repository[entity.MessageEntity]
+	query interfaces.Query[entity.MessageEntity]
 }
 
-func NewPostgresMessageRepository(exec interfaces.QueryExecutor) interfaces.Repository[entity.MessageEntity] {
-	baseRepo := repository.NewMessageRepository(exec)
+func NewPostgresMessageRepository(exec interfaces.QueryExecutor, query interfaces.Query[entity.MessageEntity]) interfaces.Repository[entity.MessageEntity] {
+	baseRepo := repository.NewMessageRepository(exec, query)
 	return &PostgresMessageRepository{repo: baseRepo}
 }
 
