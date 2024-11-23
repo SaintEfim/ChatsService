@@ -25,7 +25,7 @@ func LoggingMiddleware(logger *zap.Logger) gin.HandlerFunc {
 
 		requestBody, err := readRequestBody(c)
 		if err != nil {
-			logger.Error("Failed to read request body", zap.Error(err))
+			logger.Sugar().Errorf("Failed to read request body %s", err)
 		} else {
 			logFields = append(logFields, zap.String("request_body", requestBody))
 		}

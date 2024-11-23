@@ -41,7 +41,7 @@ func ExceptionMiddleware(logger *zap.Logger) gin.HandlerFunc {
 				Description: "Internal server error",
 			}
 
-			logger.Error("Unhandled exception", zap.String("stackTrace", string(debug.Stack())))
+			logger.Sugar().Errorf("Unhandled exception %s", err)
 		}
 
 		c.JSON(statusCode, response)
