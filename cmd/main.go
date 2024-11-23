@@ -1,12 +1,12 @@
 package main
 
 import (
-	"ChatsService/internal/database/postgres/executor"
-	"ChatsService/internal/database/postgres/repository"
 	"context"
 
 	"ChatsService/config"
 	"ChatsService/internal/controller"
+	"ChatsService/internal/database/postgres/executor"
+	"ChatsService/internal/database/postgres/repository"
 	"ChatsService/internal/handler"
 	"ChatsService/internal/models/interfaces"
 	"ChatsService/internal/server"

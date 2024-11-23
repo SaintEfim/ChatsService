@@ -1,9 +1,11 @@
 package repository
 
 import (
+	"ChatsService/internal/exception"
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"ChatsService/internal/database/postgres/query"
 	"ChatsService/internal/models/entity"
@@ -39,6 +41,10 @@ func (r *MessageRepository) GetOneById(ctx context.Context, id uuid.UUID) (*enti
 			return nil, err
 		}
 		return nil, err
+	}
+
+	if message == nil {
+		return nil, exception.NewNotFoundException(fmt.Sprintf("Message with id %s not found", id))
 	}
 
 	return message, nil

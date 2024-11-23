@@ -484,10 +484,14 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "description",
+                "stackTrace",
                 "status"
             ],
             "properties": {
                 "description": {
+                    "type": "string"
+                },
+                "stackTrace": {
                     "type": "string"
                 },
                 "status": {
@@ -528,10 +532,6 @@ const docTemplate = `{
         },
         "dto.UpdateChatDto": {
             "type": "object",
-            "required": [
-                "employee_ids",
-                "name"
-            ],
             "properties": {
                 "employee_ids": {
                     "type": "array",

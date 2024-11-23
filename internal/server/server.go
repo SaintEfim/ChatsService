@@ -48,6 +48,7 @@ func NewServer(srv *http.Server, cfg *config.Config,
 func (s *Server) Run(ctx context.Context) error {
 	g := gin.Default()
 	g.Use(middleware.LoggingMiddleware(s.logger))
+	g.Use(middleware.ExceptionMiddleware(s.logger))
 
 	s.setGinMode(ctx)
 	s.configureSwagger(ctx, g)

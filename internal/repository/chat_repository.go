@@ -1,12 +1,12 @@
 package repository
 
 import (
-	"context"
-	"fmt"
-
 	"ChatsService/internal/database/postgres/query"
+	"ChatsService/internal/exception"
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
+	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
@@ -63,21 +63,20 @@ func (r *ChatRepository) GetOneById(ctx context.Context, id uuid.UUID) (*entity.
 	}
 	defer rows.Close()
 
-	if rows.Next() {
-		err := rows.Scan(
-			&chat.Id,
-			&chat.Name,
-			&chat.IsGroup,
-			pq.Array(&chat.EmployeeIds),
-		)
-		if err != nil {
+	if !rows.Next() {
+		if err := rows.Err(); err != nil {
 			return nil, err
 		}
-	} else {
-		return nil, fmt.Errorf("chat with id %s not found", id)
+		return nil, exception.NewNotFoundException(fmt.Sprintf("Chat with id %s not found", id))
 	}
 
-	if err := rows.Err(); err != nil {
+	err = rows.Scan(
+		&chat.Id,
+		&chat.Name,
+		&chat.IsGroup,
+		pq.Array(&chat.EmployeeIds),
+	)
+	if err != nil {
 		return nil, err
 	}
 

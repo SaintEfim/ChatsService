@@ -62,19 +62,13 @@ func (h *MessageHandler) GetOneById(c *gin.Context) {
 	ctx := c.Request.Context()
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorDto{
-			Status:      http.StatusBadRequest,
-			Description: err.Error(),
-		})
+		c.Error(err)
 		return
 	}
 
 	message, err := h.controller.GetOneById(ctx, id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, dto.ErrorDto{
-			Status:      http.StatusNotFound,
-			Description: err.Error(),
-		})
+		c.Error(err)
 		return
 	}
 
