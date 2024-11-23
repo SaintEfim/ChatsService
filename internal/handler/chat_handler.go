@@ -41,10 +41,7 @@ func (h *ChatHandler) Get(c *gin.Context) {
 
 	chats, err := h.controller.Get(ctx)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
-			Status:      http.StatusInternalServerError,
-			Description: err.Error(),
-		})
+		c.Error(err)
 		return
 	}
 
@@ -107,10 +104,7 @@ func (h *ChatHandler) Create(c *gin.Context) {
 	automapper.MapLoose(chatCreateDto, chatModel)
 	createItemId, err := h.controller.Create(ctx, chatModel)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
-			Status:      http.StatusInternalServerError,
-			Description: err.Error(),
-		})
+		c.Error(err)
 		return
 	}
 
@@ -183,10 +177,7 @@ func (h *ChatHandler) Update(c *gin.Context) {
 	automapper.MapLoose(chatUpdateDto, chatModel)
 
 	if err := h.controller.Update(ctx, id, chatModel); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
-			Status:      http.StatusInternalServerError,
-			Description: err.Error(),
-		})
+		c.Error(err)
 		return
 	}
 

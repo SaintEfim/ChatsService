@@ -40,10 +40,7 @@ func (h *MessageHandler) Get(c *gin.Context) {
 
 	messages, err := h.controller.Get(ctx)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
-			Status:      http.StatusInternalServerError,
-			Description: err.Error(),
-		})
+		c.Error(err)
 		return
 	}
 	c.JSON(http.StatusOK, messages)
@@ -101,10 +98,7 @@ func (h *MessageHandler) Create(c *gin.Context) {
 
 	createItemId, err := h.controller.Create(ctx, messageModel)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
-			Status:      http.StatusInternalServerError,
-			Description: err.Error(),
-		})
+		c.Error(err)
 		return
 	}
 
@@ -177,10 +171,7 @@ func (h *MessageHandler) Update(c *gin.Context) {
 	automapper.MapLoose(messageUpdateDto, messageModel)
 
 	if err := h.controller.Update(ctx, id, messageModel); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorDto{
-			Status:      http.StatusInternalServerError,
-			Description: err.Error(),
-		})
+		c.Error(err)
 		return
 	}
 
