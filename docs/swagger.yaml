@@ -55,7 +55,6 @@ definitions:
         type: integer
     required:
     - description
-    - stackTrace
     - status
     type: object
   dto.MessageDto:
@@ -196,7 +195,7 @@ paths:
             $ref: '#/definitions/dto.ErrorDto'
       tags:
       - Chats
-    put:
+    patch:
       consumes:
       - application/json
       parameters:
@@ -218,6 +217,10 @@ paths:
           description: No Content
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/dto.ErrorDto'
         "500":
@@ -323,7 +326,7 @@ paths:
             $ref: '#/definitions/dto.ErrorDto'
       tags:
       - Messages
-    put:
+    patch:
       consumes:
       - application/json
       parameters:
@@ -345,6 +348,10 @@ paths:
           description: No Content
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/dto.ErrorDto'
         "500":

@@ -25,7 +25,7 @@ func (h *MessageHandler) ConfigureRoutes(r *gin.Engine) {
 	r.GET("/api/v1/messages/:id", h.GetOneById)
 	r.POST("/api/v1/messages", h.Create)
 	r.DELETE("/api/v1/messages/:id", h.Delete)
-	r.PUT("/api/v1/messages/:id", h.Update)
+	r.PATCH("/api/v1/messages/:id", h.Update)
 }
 
 // Get @Summary List messages
@@ -141,8 +141,9 @@ func (h *MessageHandler) Delete(c *gin.Context) {
 // @Param message body dto.UpdateMessageDto true "Message info"
 // @Success 204 "No Content"
 // @Failure 400 {object} dto.ErrorDto
+// @Failure 404 {object} dto.ErrorDto
 // @Failure 500 {object} dto.ErrorDto
-// @Router /api/v1/messages/{id} [put]
+// @Router /api/v1/messages/{id} [patch]
 func (h *MessageHandler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	messageUpdateDto := &dto.UpdateMessageDto{}
