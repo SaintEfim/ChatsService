@@ -1,7 +1,6 @@
 package main
 
 import (
-	"ChatsService/internal/database/postgres/rows"
 	"context"
 
 	"ChatsService/config"
@@ -10,6 +9,7 @@ import (
 	"ChatsService/internal/database/postgres/query"
 	"ChatsService/internal/database/postgres/repository"
 	"ChatsService/internal/database/postgres/result"
+	"ChatsService/internal/database/postgres/rows"
 	"ChatsService/internal/handler"
 	"ChatsService/internal/models/interfaces"
 	"ChatsService/internal/server"
