@@ -1,10 +1,9 @@
 package executor
 
 import (
-	"ChatsService/config"
 	"context"
-	"database/sql"
 
+	"ChatsService/config"
 	"ChatsService/internal/models/interfaces"
 
 	"github.com/jmoiron/sqlx"
@@ -39,10 +38,10 @@ func (e *SQLXExecutor) GetContext(ctx context.Context, dest interface{}, query s
 	return e.db.GetContext(ctx, dest, query, args...)
 }
 
-func (e *SQLXExecutor) QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
+func (e *SQLXExecutor) QueryContext(ctx context.Context, query string, args ...interface{}) (interfaces.RowsAdapter, error) {
 	return e.db.QueryContext(ctx, query, args...)
 }
 
-func (e *SQLXExecutor) ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
+func (e *SQLXExecutor) ExecContext(ctx context.Context, query string, args ...interface{}) (interfaces.ResultAdapter, error) {
 	return e.db.ExecContext(ctx, query, args...)
 }

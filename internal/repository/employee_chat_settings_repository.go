@@ -1,12 +1,10 @@
 package repository
 
 import (
-	"ChatsService/internal/exception"
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 
+	"ChatsService/internal/exception"
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
 
@@ -40,9 +38,6 @@ func (r *EmployeeChatSettingsRepository) GetOneById(ctx context.Context, id uuid
 	employeeChatSettings := &entity.EmployeeChatSettingsEntity{}
 
 	if err := r.db.GetContext(ctx, &employeeChatSettings, r.query.Get(), id); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, err
-		}
 		return nil, err
 	}
 
@@ -69,17 +64,17 @@ func (r *EmployeeChatSettingsRepository) Create(ctx context.Context, employeeCha
 }
 
 func (r *EmployeeChatSettingsRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	_, err := r.GetOneById(ctx, id)
+	if err != nil {
+		return err
+	}
+
 	result, err := r.db.ExecContext(ctx, r.query.Delete(), id)
 	if err != nil {
 		return err
 	}
 
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if rowsAffected == 0 {
+	if err := r.checkRows(ctx, result); err != nil {
 		return err
 	}
 
@@ -87,6 +82,11 @@ func (r *EmployeeChatSettingsRepository) Delete(ctx context.Context, id uuid.UUI
 }
 
 func (r *EmployeeChatSettingsRepository) Update(ctx context.Context, id uuid.UUID, employeeChatSettings *entity.EmployeeChatSettingsEntity) error {
+	_, err := r.GetOneById(ctx, id)
+	if err != nil {
+		return err
+	}
+
 	result, err := r.db.ExecContext(ctx, r.query.Update(),
 		employeeChatSettings.DisplayName,
 		id)
@@ -94,6 +94,14 @@ func (r *EmployeeChatSettingsRepository) Update(ctx context.Context, id uuid.UUI
 		return err
 	}
 
+	if err := r.checkRows(ctx, result); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *EmployeeChatSettingsRepository) checkRows(ctx context.Context, result interfaces.ResultAdapter) error {
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return err

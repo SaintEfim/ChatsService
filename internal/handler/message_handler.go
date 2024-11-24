@@ -126,10 +126,7 @@ func (h *MessageHandler) Delete(c *gin.Context) {
 	}
 
 	if err := h.controller.Delete(ctx, id); err != nil {
-		c.JSON(http.StatusNotFound, dto.ErrorDto{
-			Status:      http.StatusNotFound,
-			Description: err.Error(),
-		})
+		c.Error(err)
 		return
 	}
 

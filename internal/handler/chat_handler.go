@@ -102,6 +102,7 @@ func (h *ChatHandler) Create(c *gin.Context) {
 	}
 
 	automapper.MapLoose(chatCreateDto, chatModel)
+
 	createItemId, err := h.controller.Create(ctx, chatModel)
 	if err != nil {
 		c.Error(err)
@@ -132,10 +133,7 @@ func (h *ChatHandler) Delete(c *gin.Context) {
 	}
 
 	if err := h.controller.Delete(ctx, id); err != nil {
-		c.JSON(http.StatusNotFound, dto.ErrorDto{
-			Status:      http.StatusNotFound,
-			Description: err.Error(),
-		})
+		c.Error(err)
 		return
 	}
 

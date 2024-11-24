@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ChatsService/internal/database/postgres/rows"
 	"context"
 
 	"ChatsService/config"
@@ -8,6 +9,7 @@ import (
 	"ChatsService/internal/database/postgres/executor"
 	"ChatsService/internal/database/postgres/query"
 	"ChatsService/internal/database/postgres/repository"
+	"ChatsService/internal/database/postgres/result"
 	"ChatsService/internal/handler"
 	"ChatsService/internal/models/interfaces"
 	"ChatsService/internal/server"
@@ -71,6 +73,9 @@ func main() {
 
 			executor.NewSQLXExecutor,
 			executor.PostgresConnect,
+
+			result.NewSqlResultAdapter,
+			rows.NewSqlRowsAdapter,
 
 			repository.NewPostgresChatRepository,
 			repository.NewPostgresMessageRepository,
