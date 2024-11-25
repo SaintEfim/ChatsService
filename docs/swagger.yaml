@@ -195,7 +195,7 @@ paths:
             $ref: '#/definitions/dto.ErrorDto'
       tags:
       - Chats
-    patch:
+    put:
       consumes:
       - application/json
       parameters:
@@ -326,7 +326,7 @@ paths:
             $ref: '#/definitions/dto.ErrorDto'
       tags:
       - Messages
-    patch:
+    put:
       consumes:
       - application/json
       parameters:

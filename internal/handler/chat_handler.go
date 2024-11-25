@@ -25,7 +25,7 @@ func (h *ChatHandler) ConfigureRoutes(r *gin.Engine) {
 	r.GET("/api/v1/chats/:id", h.GetOneById)
 	r.POST("/api/v1/chats", h.Create)
 	r.DELETE("/api/v1/chats/:id", h.Delete)
-	r.PATCH("/api/v1/chats/:id", h.Update)
+	r.PUT("/api/v1/chats/:id", h.Update)
 }
 
 // Get @Summary List chats
@@ -150,7 +150,7 @@ func (h *ChatHandler) Delete(c *gin.Context) {
 // @Failure 400 {object} dto.ErrorDto
 // @Failure 404 {object} dto.ErrorDto
 // @Failure 500 {object} dto.ErrorDto
-// @Router /api/v1/chats/{id} [patch]
+// @Router /api/v1/chats/{id} [put]
 func (h *ChatHandler) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	chatUpdateDto := &dto.UpdateChatDto{}
