@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"fmt"
+	"net"
 	"net/http"
 	"time"
 
@@ -21,20 +21,20 @@ import (
 type Server struct {
 	srv            *http.Server
 	cfg            *config.Config
-	chatHandler    interfaces.Handler[dto.ChatDto]
-	messageHandler interfaces.Handler[dto.MessageDto]
+	chatHandler    interfaces.Handler[dto.Chat]
+	messageHandler interfaces.Handler[dto.Message]
 	logger         *zap.Logger
 }
 
 func NewHTTPServer(cfg *config.Config) *http.Server {
 	return &http.Server{
-		Addr: fmt.Sprintf("%s:%s", cfg.HTTPServer.Addr, cfg.HTTPServer.Port),
+		Addr: net.JoinHostPort(cfg.HTTPServer.Addr, cfg.HTTPServer.Port),
 	}
 }
 
 func NewServer(srv *http.Server, cfg *config.Config,
-	chatHandler interfaces.Handler[dto.ChatDto],
-	messageHandler interfaces.Handler[dto.MessageDto],
+	chatHandler interfaces.Handler[dto.Chat],
+	messageHandler interfaces.Handler[dto.Message],
 	logger *zap.Logger) interfaces.Server {
 	return &Server{
 		srv:            srv,
@@ -47,8 +47,8 @@ func NewServer(srv *http.Server, cfg *config.Config,
 
 func (s *Server) Run(ctx context.Context) error {
 	g := gin.Default()
+
 	g.Use(middleware.LoggingMiddleware(s.logger))
-	g.Use(middleware.ExceptionMiddleware(s.logger))
 
 	s.setGinMode(ctx)
 	s.configureSwagger(ctx, g)

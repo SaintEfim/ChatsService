@@ -1,12 +1,12 @@
 package query
 
 import (
-	"ChatsService/internal/models/entity"
+	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/interfaces"
 )
 
 const (
-	getAllChats = `SELECT id, name, is_group, employee_ids FROM chats`
+	getAllChats = `SELECT id, name FROM chats`
 	getChatById = `SELECT id, name, is_group, employee_ids FROM chats WHERE id = $1`
 	createChat  = `INSERT INTO chats (id, name, is_group, employee_ids, created_at, updated_at) VALUES ($1, $2, $3, $4, NOW(), NOW())`
 	deleteChat  = `DELETE FROM chats WHERE id = $1`
@@ -15,7 +15,7 @@ const (
 
 type ChatQuery struct{}
 
-func NewChatQuery() interfaces.Query[entity.ChatEntity] {
+func NewChatQuery() interfaces.Query[dto.Chat] {
 	return &ChatQuery{}
 }
 

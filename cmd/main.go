@@ -5,13 +5,11 @@ import (
 
 	"ChatsService/config"
 	"ChatsService/internal/controller"
-	"ChatsService/internal/database/postgres/executor"
+	"ChatsService/internal/database/postgres"
 	"ChatsService/internal/database/postgres/query"
-	"ChatsService/internal/database/postgres/repository"
-	"ChatsService/internal/database/postgres/result"
-	"ChatsService/internal/database/postgres/rows"
 	"ChatsService/internal/handler"
 	"ChatsService/internal/models/interfaces"
+	"ChatsService/internal/repository"
 	"ChatsService/internal/server"
 	"ChatsService/pkg/logger"
 
@@ -68,18 +66,12 @@ func main() {
 			logger.NewLogger,
 
 			query.NewChatQuery,
-			query.NewEmployeeChatSettingsQueryQuery,
 			query.NewMessageQuery,
 
-			executor.NewSQLXExecutor,
-			executor.PostgresConnect,
+			postgres.Connect,
 
-			result.NewSqlResultAdapter,
-			rows.NewSqlRowsAdapter,
-
-			repository.NewPostgresChatRepository,
-			repository.NewPostgresMessageRepository,
-			repository.NewPostgresEmployeeChatSettingsRepository,
+			repository.NewChatRepository,
+			repository.NewMessageRepository,
 
 			controller.NewChatController,
 			controller.NewMessageController,

@@ -1,55 +1,43 @@
 package controller
 
 import (
-	"ChatsService/internal/models/entity"
-	"ChatsService/internal/models/interfaces"
-	"ChatsService/internal/models/model"
 	"context"
 
+	"ChatsService/internal/models/dto"
+	"ChatsService/internal/models/interfaces"
+
 	"github.com/google/uuid"
-	"github.com/stroiman/go-automapper"
 )
 
 type MessageController struct {
-	rep interfaces.Repository[entity.MessageEntity]
+	rep interfaces.Repository[dto.Message, dto.Message, dto.MessageCreate, dto.MessageUpdate]
 }
 
-func NewMessageController(rep interfaces.Repository[entity.MessageEntity]) interfaces.Controller[model.MessageModel] {
+func NewMessageController(rep interfaces.Repository[dto.Message, dto.Message, dto.MessageCreate, dto.MessageUpdate]) interfaces.Controller[dto.Message, dto.Message, dto.MessageCreate, dto.MessageUpdate] {
 	return &MessageController{rep: rep}
 }
 
-func (c *MessageController) Get(ctx context.Context) ([]*model.MessageModel, error) {
-	messageModels := make([]*model.MessageModel, 0)
+func (c *MessageController) Get(ctx context.Context) ([]*dto.Message, error) {
 	messages, err := c.rep.Get(ctx)
 
 	if err != nil {
 		return nil, err
 	}
 
-	automapper.MapLoose(messages, &messageModels)
-
-	return messageModels, nil
+	return messages, nil
 }
 
-func (c *MessageController) GetOneById(ctx context.Context, id uuid.UUID) (*model.MessageModel, error) {
-	messageModel := &model.MessageModel{}
+func (c *MessageController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Message, error) {
 	message, err := c.rep.GetOneById(ctx, id)
-
 	if err != nil {
 		return nil, err
 	}
 
-	automapper.MapLoose(message, messageModel)
-
-	return messageModel, nil
+	return message, nil
 }
 
-func (c *MessageController) Create(ctx context.Context, message *model.MessageModel) (uuid.UUID, error) {
-	messageEntity := &entity.MessageEntity{}
-
-	automapper.MapLoose(message, messageEntity)
-
-	createItemId, err := c.rep.Create(ctx, messageEntity)
+func (c *MessageController) Create(ctx context.Context, message *dto.MessageCreate) (uuid.UUID, error) {
+	createItemId, err := c.rep.Create(ctx, message)
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -66,12 +54,8 @@ func (c *MessageController) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (c *MessageController) Update(ctx context.Context, id uuid.UUID, message *model.MessageModel) error {
-	messageEntity := &entity.MessageEntity{}
-
-	automapper.MapLoose(message, messageEntity)
-
-	err := c.rep.Update(ctx, id, messageEntity)
+func (c *MessageController) Update(ctx context.Context, id uuid.UUID, message *dto.MessageUpdate) error {
+	err := c.rep.Update(ctx, id, message)
 	if err != nil {
 		return err
 	}

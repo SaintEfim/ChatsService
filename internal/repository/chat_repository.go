@@ -2,10 +2,10 @@ package repository
 
 import (
 	"context"
-	"fmt"
+	"database/sql"
+	"github.com/jmoiron/sqlx"
 
-	"ChatsService/internal/exception"
-	"ChatsService/internal/models/entity"
+	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/interfaces"
 
 	"github.com/google/uuid"
@@ -13,19 +13,19 @@ import (
 )
 
 type ChatRepository struct {
-	db    interfaces.QueryExecutor
-	query interfaces.Query[entity.ChatEntity]
+	db    *sqlx.DB
+	query interfaces.Query[dto.Chat]
 }
 
-func NewChatRepository(db interfaces.QueryExecutor, query interfaces.Query[entity.ChatEntity]) interfaces.Repository[entity.ChatEntity] {
+func NewChatRepository(db *sqlx.DB, query interfaces.Query[dto.Chat]) interfaces.Repository[dto.Chat, dto.ChatDetail, dto.ChatCreate, dto.ChatUpdate] {
 	return &ChatRepository{
 		db:    db,
 		query: query,
 	}
 }
 
-func (r *ChatRepository) Get(ctx context.Context) ([]*entity.ChatEntity, error) {
-	chats := make([]*entity.ChatEntity, 0)
+func (r *ChatRepository) Get(ctx context.Context) ([]*dto.Chat, error) {
+	chats := make([]*dto.Chat, 0)
 
 	rows, err := r.db.QueryContext(ctx, r.query.Get())
 	if err != nil {
@@ -34,13 +34,11 @@ func (r *ChatRepository) Get(ctx context.Context) ([]*entity.ChatEntity, error) 
 	defer rows.Close()
 
 	for rows.Next() {
-		chat := &entity.ChatEntity{}
+		chat := &dto.Chat{}
 
 		err := rows.Scan(
 			&chat.Id,
 			&chat.Name,
-			&chat.IsGroup,
-			pq.Array(&chat.EmployeeIds),
 		)
 		if err != nil {
 			return nil, err
@@ -56,8 +54,8 @@ func (r *ChatRepository) Get(ctx context.Context) ([]*entity.ChatEntity, error) 
 	return chats, nil
 }
 
-func (r *ChatRepository) GetOneById(ctx context.Context, id uuid.UUID) (*entity.ChatEntity, error) {
-	chat := &entity.ChatEntity{}
+func (r *ChatRepository) GetOneById(ctx context.Context, id uuid.UUID) (*dto.ChatDetail, error) {
+	chat := &dto.ChatDetail{}
 
 	rows, err := r.db.QueryContext(ctx, r.query.GetOneById(), id)
 	if err != nil {
@@ -69,7 +67,7 @@ func (r *ChatRepository) GetOneById(ctx context.Context, id uuid.UUID) (*entity.
 		if err := rows.Err(); err != nil {
 			return nil, err
 		}
-		return nil, exception.NewNotFoundException(fmt.Sprintf("Chat with id %s not found", id))
+		return nil, err
 	}
 
 	err = rows.Scan(
@@ -85,23 +83,23 @@ func (r *ChatRepository) GetOneById(ctx context.Context, id uuid.UUID) (*entity.
 	return chat, nil
 }
 
-func (r *ChatRepository) Create(ctx context.Context, chat *entity.ChatEntity) (uuid.UUID, error) {
-	chat.Id = uuid.New()
+func (r *ChatRepository) Create(ctx context.Context, entity *dto.ChatCreate) (uuid.UUID, error) {
+	id := uuid.New()
 
-	if chat.EmployeeIds == nil {
-		chat.EmployeeIds = make([]uuid.UUID, 0)
+	if entity.EmployeeIds == nil {
+		entity.EmployeeIds = make([]uuid.UUID, 0)
 	}
 
 	_, err := r.db.ExecContext(ctx, r.query.Create(),
-		chat.Id,
-		chat.Name,
-		chat.IsGroup,
-		pq.Array(chat.EmployeeIds))
+		id,
+		entity.Name,
+		entity.IsGroup,
+		pq.Array(entity.EmployeeIds))
 	if err != nil {
 		return uuid.Nil, err
 	}
 
-	return chat.Id, nil
+	return id, nil
 }
 
 func (r *ChatRepository) Delete(ctx context.Context, id uuid.UUID) error {
@@ -122,19 +120,19 @@ func (r *ChatRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (r *ChatRepository) Update(ctx context.Context, id uuid.UUID, chat *entity.ChatEntity) error {
+func (r *ChatRepository) Update(ctx context.Context, id uuid.UUID, entity *dto.ChatUpdate) error {
 	_, err := r.GetOneById(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	if chat.EmployeeIds == nil {
-		chat.EmployeeIds = make([]uuid.UUID, 0)
+	if entity.EmployeeIds == nil {
+		entity.EmployeeIds = make([]uuid.UUID, 0)
 	}
 
 	result, err := r.db.ExecContext(ctx, r.query.Update(),
-		chat.Name,
-		pq.Array(chat.EmployeeIds),
+		entity.Name,
+		pq.Array(entity.EmployeeIds),
 		id)
 	if err != nil {
 		return err
@@ -147,7 +145,7 @@ func (r *ChatRepository) Update(ctx context.Context, id uuid.UUID, chat *entity.
 	return nil
 }
 
-func (r *ChatRepository) checkRows(ctx context.Context, result interfaces.ResultAdapter) error {
+func (r *ChatRepository) checkRows(ctx context.Context, result sql.Result) error {
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return err

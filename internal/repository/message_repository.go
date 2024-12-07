@@ -2,28 +2,29 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
-	"ChatsService/internal/exception"
-	"ChatsService/internal/models/entity"
+	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/interfaces"
 
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 )
 
 type MessageRepository struct {
-	db    interfaces.QueryExecutor
-	query interfaces.Query[entity.MessageEntity]
+	db    *sqlx.DB
+	query interfaces.Query[dto.Message]
 }
 
-func NewMessageRepository(db interfaces.QueryExecutor, query interfaces.Query[entity.MessageEntity]) interfaces.Repository[entity.MessageEntity] {
+func NewMessageRepository(db *sqlx.DB, query interfaces.Query[dto.Message]) interfaces.Repository[dto.Message, dto.Message, dto.MessageCreate, dto.MessageUpdate] {
 	return &MessageRepository{
 		db:    db,
 		query: query}
 }
 
-func (r *MessageRepository) Get(ctx context.Context) ([]*entity.MessageEntity, error) {
-	messages := make([]*entity.MessageEntity, 0)
+func (r *MessageRepository) Get(ctx context.Context) ([]*dto.Message, error) {
+	messages := make([]*dto.Message, 0)
 
 	err := r.db.SelectContext(ctx, &messages, r.query.Get())
 	if err != nil {
@@ -33,25 +34,25 @@ func (r *MessageRepository) Get(ctx context.Context) ([]*entity.MessageEntity, e
 	return messages, nil
 }
 
-func (r *MessageRepository) GetOneById(ctx context.Context, id uuid.UUID) (*entity.MessageEntity, error) {
-	message := &entity.MessageEntity{}
+func (r *MessageRepository) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Message, error) {
+	message := &dto.Message{}
 
 	if err := r.db.GetContext(ctx, &message, r.query.GetOneById(), id); err != nil {
 		return nil, err
 	}
 
 	if message == nil {
-		return nil, exception.NewNotFoundException(fmt.Sprintf("Message with id %s not found", id))
+		return nil, fmt.Errorf("message not found")
 	}
 
 	return message, nil
 }
 
-func (r *MessageRepository) Create(ctx context.Context, message *entity.MessageEntity) (uuid.UUID, error) {
-	message.Id = uuid.New()
+func (r *MessageRepository) Create(ctx context.Context, message *dto.MessageCreate) (uuid.UUID, error) {
+	id := uuid.New()
 
 	_, err := r.db.ExecContext(ctx, r.query.Create(),
-		message.Id,
+		id,
 		message.ChatId,
 		message.EmployeeId,
 		message.Text)
@@ -59,7 +60,7 @@ func (r *MessageRepository) Create(ctx context.Context, message *entity.MessageE
 		return uuid.Nil, err
 	}
 
-	return message.Id, nil
+	return id, nil
 }
 
 func (r *MessageRepository) Delete(ctx context.Context, id uuid.UUID) error {
@@ -80,7 +81,7 @@ func (r *MessageRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (r *MessageRepository) Update(ctx context.Context, id uuid.UUID, message *entity.MessageEntity) error {
+func (r *MessageRepository) Update(ctx context.Context, id uuid.UUID, message *dto.MessageUpdate) error {
 	_, err := r.GetOneById(ctx, id)
 	if err != nil {
 		return err
@@ -100,7 +101,7 @@ func (r *MessageRepository) Update(ctx context.Context, id uuid.UUID, message *e
 	return nil
 }
 
-func (r *MessageRepository) checkRows(ctx context.Context, result interfaces.ResultAdapter) error {
+func (r *MessageRepository) checkRows(ctx context.Context, result sql.Result) error {
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return err
