@@ -102,7 +102,7 @@ func (h *ChatHandler) Create(c *gin.Context) {
 		return
 	}
 
-	createItemId, err := h.controller.Create(ctx, chatCreate)
+	createItem, err := h.controller.Create(ctx, chatCreate)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Error{
 			Status:      http.StatusInternalServerError,
@@ -111,7 +111,7 @@ func (h *ChatHandler) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, createItemId)
+	c.JSON(http.StatusCreated, createItem.Id)
 }
 
 // Delete @Summary Delete chat by ID

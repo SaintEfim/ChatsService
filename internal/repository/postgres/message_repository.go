@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"context"
@@ -12,21 +12,28 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+const (
+	getAllMessages = `SELECT id, chat_id, employee_id, colleague_id, text, created_at FROM messages`
+	getMessageById = `SELECT id, chat_id, employee_id, colleague_id, text FROM messages WHERE id = $1`
+	createMessage  = `INSERT INTO messages (id, chat_id, employeeId, colleague_id, text, created_at, updated_at) VALUES ($1, $2, $3, $4, NOW(), NOW())`
+	deleteMessage  = `DELETE FROM messages WHERE id = $1`
+	updateMessage  = `UPDATE messages SET text = $1, updated_at = NOW() WHERE id = $2`
+)
+
 type MessageRepository struct {
-	db    *sqlx.DB
-	query interfaces.Query[dto.Message]
+	db *sqlx.DB
 }
 
-func NewMessageRepository(db *sqlx.DB, query interfaces.Query[dto.Message]) interfaces.Repository[dto.Message, dto.Message, dto.MessageCreate, dto.MessageUpdate] {
+func NewMessageRepository(db *sqlx.DB) interfaces.Repository[dto.Message, dto.Message, dto.MessageCreate, dto.MessageUpdate] {
 	return &MessageRepository{
-		db:    db,
-		query: query}
+		db: db,
+	}
 }
 
 func (r *MessageRepository) Get(ctx context.Context) ([]*dto.Message, error) {
 	messages := make([]*dto.Message, 0)
 
-	err := r.db.SelectContext(ctx, &messages, r.query.Get())
+	err := r.db.SelectContext(ctx, &messages, getAllMessages)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +44,7 @@ func (r *MessageRepository) Get(ctx context.Context) ([]*dto.Message, error) {
 func (r *MessageRepository) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Message, error) {
 	message := &dto.Message{}
 
-	if err := r.db.GetContext(ctx, &message, r.query.GetOneById(), id); err != nil {
+	if err := r.db.GetContext(ctx, &message, getMessageById, id); err != nil {
 		return nil, err
 	}
 
@@ -48,19 +55,24 @@ func (r *MessageRepository) GetOneById(ctx context.Context, id uuid.UUID) (*dto.
 	return message, nil
 }
 
-func (r *MessageRepository) Create(ctx context.Context, message *dto.MessageCreate) (uuid.UUID, error) {
+func (r *MessageRepository) Create(ctx context.Context, message *dto.MessageCreate) (*dto.Message, error) {
 	id := uuid.New()
 
-	_, err := r.db.ExecContext(ctx, r.query.Create(),
+	_, err := r.db.ExecContext(ctx, createMessage,
 		id,
 		message.ChatId,
 		message.EmployeeId,
 		message.Text)
 	if err != nil {
-		return uuid.Nil, err
+		return nil, err
 	}
 
-	return id, nil
+	createItem, err := r.GetOneById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return createItem, nil
 }
 
 func (r *MessageRepository) Delete(ctx context.Context, id uuid.UUID) error {
@@ -69,7 +81,7 @@ func (r *MessageRepository) Delete(ctx context.Context, id uuid.UUID) error {
 		return err
 	}
 
-	result, err := r.db.ExecContext(ctx, r.query.Delete(), id)
+	result, err := r.db.ExecContext(ctx, deleteMessage, id)
 	if err != nil {
 		return err
 	}
@@ -87,7 +99,7 @@ func (r *MessageRepository) Update(ctx context.Context, id uuid.UUID, message *d
 		return err
 	}
 
-	result, err := r.db.ExecContext(ctx, r.query.Update(),
+	result, err := r.db.ExecContext(ctx, updateMessage,
 		message.Text,
 		id)
 	if err != nil {

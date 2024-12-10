@@ -1,6 +1,7 @@
 package main
 
 import (
+	postgres2 "ChatsService/internal/repository/postgres"
 	"context"
 
 	"ChatsService/config"
@@ -9,7 +10,6 @@ import (
 	"ChatsService/internal/database/postgres/query"
 	"ChatsService/internal/handler"
 	"ChatsService/internal/models/interfaces"
-	"ChatsService/internal/repository"
 	"ChatsService/internal/server"
 	"ChatsService/pkg/logger"
 
@@ -70,8 +70,8 @@ func main() {
 
 			postgres.Connect,
 
-			repository.NewChatRepository,
-			repository.NewMessageRepository,
+			postgres2.NewChatRepository,
+			postgres2.NewMessageRepository,
 
 			controller.NewChatController,
 			controller.NewMessageController,

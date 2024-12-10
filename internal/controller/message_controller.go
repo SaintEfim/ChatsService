@@ -36,13 +36,13 @@ func (c *MessageController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.
 	return message, nil
 }
 
-func (c *MessageController) Create(ctx context.Context, message *dto.MessageCreate) (uuid.UUID, error) {
-	createItemId, err := c.rep.Create(ctx, message)
+func (c *MessageController) Create(ctx context.Context, message *dto.MessageCreate) (*dto.Message, error) {
+	createItem, err := c.rep.Create(ctx, message)
 	if err != nil {
-		return uuid.Nil, err
+		return nil, err
 	}
 
-	return createItemId, err
+	return createItem, err
 }
 
 func (c *MessageController) Delete(ctx context.Context, id uuid.UUID) error {

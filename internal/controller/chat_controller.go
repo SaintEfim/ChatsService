@@ -37,13 +37,13 @@ func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Cha
 	return chat, nil
 }
 
-func (c *ChatController) Create(ctx context.Context, chat *dto.ChatCreate) (uuid.UUID, error) {
-	createItemId, err := c.rep.Create(ctx, chat)
+func (c *ChatController) Create(ctx context.Context, chat *dto.ChatCreate) (*dto.ChatDetail, error) {
+	createItem, err := c.rep.Create(ctx, chat)
 	if err != nil {
-		return uuid.Nil, err
+		return nil, err
 	}
 
-	return createItemId, nil
+	return createItem, nil
 }
 
 func (c *ChatController) Delete(ctx context.Context, id uuid.UUID) error {
