@@ -1,8 +1,6 @@
 package interfaces
 
-import (
-	"context"
-)
+import "context"
 
 type Server interface {
 	Run(ctx context.Context) error

@@ -1,23 +1,21 @@
 package main
 
 import (
-	postgres2 "ChatsService/internal/repository/postgres"
 	"context"
+	"database/sql"
 
 	"ChatsService/config"
 	"ChatsService/internal/controller"
-	"ChatsService/internal/database/postgres"
-	"ChatsService/internal/database/postgres/query"
 	"ChatsService/internal/handler"
 	"ChatsService/internal/models/interfaces"
+	"ChatsService/internal/repository/postgres"
 	"ChatsService/internal/server"
 	"ChatsService/pkg/logger"
 
-	"github.com/jmoiron/sqlx"
 	"go.uber.org/fx"
 )
 
-func registerPostgres(lc fx.Lifecycle, db *sqlx.DB) {
+func registerPostgres(lc fx.Lifecycle, db *sql.DB) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			if err := db.PingContext(ctx); err != nil {
@@ -64,21 +62,13 @@ func main() {
 		}),
 		fx.Provide(
 			logger.NewLogger,
-
-			query.NewChatQuery,
-			query.NewMessageQuery,
-
 			postgres.Connect,
-
-			postgres2.NewChatRepository,
-			postgres2.NewMessageRepository,
-
+			postgres.NewChatRepository,
+			postgres.NewMessageRepository,
 			controller.NewChatController,
 			controller.NewMessageController,
-
 			handler.NewChatHandler,
 			handler.NewMessageHandler,
-
 			server.NewHTTPServer,
 			server.NewServer,
 		),

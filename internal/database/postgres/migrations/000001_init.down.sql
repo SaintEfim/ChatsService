@@ -1,3 +1,0 @@
-DROP TABLE IF EXISTS Messages;
-DROP TABLE IF EXISTS EmployeeChatSettings;
-DROP TABLE IF EXISTS Chats;

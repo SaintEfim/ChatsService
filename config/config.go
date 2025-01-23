@@ -19,8 +19,6 @@ type HTTPServer struct {
 }
 
 type DataBase struct {
-	DriverName       string `yaml:"DriverName"`
-	DataBaseName     string `yaml:"DataBaseName"`
 	ConnectionString string `yaml:"ConnectionString"`
 }
 

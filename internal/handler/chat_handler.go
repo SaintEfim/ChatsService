@@ -111,7 +111,7 @@ func (h *ChatHandler) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, createItem.Id)
+	c.JSON(http.StatusCreated, &dto.CreateAction{Id: createItem.Id})
 }
 
 // Delete @Summary Delete chat by ID
