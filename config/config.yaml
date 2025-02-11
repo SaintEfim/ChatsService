@@ -10,3 +10,7 @@ Logs:
   Level: info
   MaxAge: 1
   MaxBackups: 4
+Cors:
+  "AllowedOrigins": [
+    "http://localhost:4200"
+  ]

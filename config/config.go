@@ -7,6 +7,7 @@ type Config struct {
 	HTTPServer           HTTPServer           `yaml:"HTTPServer"`
 	DataBase             DataBase             `yaml:"DataBase"`
 	Logs                 Logs                 `yaml:"Logs"`
+	Cors                 Cors                 `yaml:"Cors"`
 }
 
 type EnvironmentVariables struct {
@@ -27,6 +28,10 @@ type Logs struct {
 	Level      string `yaml:"Level"`
 	MaxAge     int    `yaml:"MaxAge"`
 	MaxBackups int    `yaml:"MaxBackups"`
+}
+
+type Cors struct {
+	AllowedOrigins []string `yaml:"AllowedOrigins"`
 }
 
 func ReadConfig(cfgName, cfgType, cfgPath string) (*Config, error) {
