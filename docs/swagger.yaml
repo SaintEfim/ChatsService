@@ -1,0 +1,363 @@
+definitions:
+  dto.ChatDto:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    required:
+    - id
+    - name
+    type: object
+  dto.CreateActionDto:
+    properties:
+      id:
+        type: string
+    required:
+    - id
+    type: object
+  dto.CreateChatDto:
+    properties:
+      employee_ids:
+        items:
+          type: string
+        type: array
+      is_group:
+        type: boolean
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  dto.CreateMessageDto:
+    properties:
+      chat_id:
+        type: string
+      colleague_id:
+        type: string
+      employee_id:
+        type: string
+      text:
+        type: string
+    required:
+    - chat_id
+    - colleague_id
+    - employee_id
+    - text
+    type: object
+  dto.ErrorDto:
+    properties:
+      description:
+        type: string
+      stackTrace:
+        type: string
+      status:
+        type: integer
+    required:
+    - description
+    - status
+    type: object
+  dto.MessageDto:
+    properties:
+      chat_id:
+        type: string
+      colleague_id:
+        type: string
+      created_at:
+        type: string
+      employee_id:
+        type: string
+      id:
+        type: string
+      text:
+        type: string
+    required:
+    - chat_id
+    - colleague_id
+    - created_at
+    - employee_id
+    - id
+    - text
+    type: object
+  dto.UpdateChatDto:
+    properties:
+      employee_ids:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+    type: object
+  dto.UpdateMessageDto:
+    properties:
+      text:
+        type: string
+    required:
+    - text
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/chats:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ChatDto'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+      tags:
+      - Chats
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Chat info
+        in: body
+        name: chat
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateChatDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CreateActionDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+      tags:
+      - Chats
+  /api/v1/chats/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+      tags:
+      - Chats
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ChatDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+      tags:
+      - Chats
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Chat info
+        in: body
+        name: chat
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateChatDto'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+      tags:
+      - Chats
+  /api/v1/messages:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.MessageDto'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+      tags:
+      - Messages
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Message info
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateMessageDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CreateActionDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+      tags:
+      - Messages
+  /api/v1/messages/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+      tags:
+      - Messages
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.MessageDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+      tags:
+      - Messages
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Message ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Message info
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateMessageDto'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorDto'
+      tags:
+      - Messages
+swagger: "2.0"

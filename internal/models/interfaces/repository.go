@@ -6,10 +6,10 @@ import (
 	"github.com/google/uuid"
 )
 
-type Repository[T any] interface {
-	Get(ctx context.Context) ([]*T, error)
-	GetOneById(ctx context.Context, id uuid.UUID) (*T, error)
-	Create(ctx context.Context, entity *T) error
+type Repository[TEntity any] interface {
+	Get(ctx context.Context) ([]*TEntity, error)
+	GetOneById(ctx context.Context, id uuid.UUID) (*TEntity, error)
+	Create(ctx context.Context, entity *TEntity) (*TEntity, error)
 	Delete(ctx context.Context, id uuid.UUID) error
-	Update(ctx context.Context, id uuid.UUID, entity *T) error
+	Update(ctx context.Context, id uuid.UUID, entity *TEntity) error
 }

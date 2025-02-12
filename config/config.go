@@ -4,17 +4,14 @@ import "github.com/spf13/viper"
 
 type Config struct {
 	EnvironmentVariables EnvironmentVariables `yaml:"EnvironmentVariables"`
-	ConnectionStrings    ConnectionStrings    `yaml:"ConnectionStrings"`
 	HTTPServer           HTTPServer           `yaml:"HTTPServer"`
+	DataBase             DataBase             `yaml:"DataBase"`
 	Logs                 Logs                 `yaml:"Logs"`
+	Cors                 Cors                 `yaml:"Cors"`
 }
 
 type EnvironmentVariables struct {
 	Environment string `yaml:"Environment"`
-}
-
-type ConnectionStrings struct {
-	ServiceDb string `yaml:"ServiceDb"`
 }
 
 type HTTPServer struct {
@@ -22,11 +19,19 @@ type HTTPServer struct {
 	Port string `yaml:"Port"`
 }
 
+type DataBase struct {
+	ConnectionString string `yaml:"ConnectionString"`
+}
+
 type Logs struct {
 	Path       string `yaml:"Path"`
 	Level      string `yaml:"Level"`
 	MaxAge     int    `yaml:"MaxAge"`
 	MaxBackups int    `yaml:"MaxBackups"`
+}
+
+type Cors struct {
+	AllowedOrigins []string `yaml:"AllowedOrigins"`
 }
 
 func ReadConfig(cfgName, cfgType, cfgPath string) (*Config, error) {
