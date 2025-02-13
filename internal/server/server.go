@@ -54,7 +54,9 @@ func (s *Server) Run(ctx context.Context) error {
 	s.configureSwagger(ctx, g)
 	s.configurationHandler(ctx, g)
 
-	s.srv.Handler = g
+	handler := CorsSettings(s.cfg).Handler(g)
+
+	s.srv.Handler = handler
 
 	s.logger.Sugar().Infof("Listening and serving HTTP on %s\n", s.srv.Addr)
 

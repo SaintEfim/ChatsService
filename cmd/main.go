@@ -2,30 +2,41 @@ package main
 
 import (
 	"context"
-	"database/sql"
 
 	"ChatsService/config"
 	"ChatsService/internal/controller"
 	"ChatsService/internal/handler"
 	"ChatsService/internal/models/interfaces"
-	"ChatsService/internal/repository/postgres"
+	"ChatsService/internal/repository"
+	"ChatsService/internal/postgres"
 	"ChatsService/internal/server"
 	"ChatsService/pkg/logger"
 
 	"go.uber.org/fx"
+	"gorm.io/gorm"
 )
 
-func registerPostgres(lc fx.Lifecycle, db *sql.DB) {
+func registerPostgres(lc fx.Lifecycle, db *gorm.DB) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			if err := db.PingContext(ctx); err != nil {
+			sqlDB, err := db.DB()
+			if err != nil {
+				return err
+			}
+
+			if err := sqlDB.PingContext(ctx); err != nil {
 				return err
 			}
 
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			return db.Close()
+			sqlDB, err := db.DB()
+			if err != nil {
+				return err
+			}
+
+			return sqlDB.Close()
 		},
 	})
 }
@@ -62,9 +73,9 @@ func main() {
 		}),
 		fx.Provide(
 			logger.NewLogger,
-			postgres.Connect,
-			postgres.NewChatRepository,
-			postgres.NewMessageRepository,
+			postgres.ConnectToDB,
+			repository.NewChatRepository,
+			repository.NewMessageRepository,
 			controller.NewChatController,
 			controller.NewMessageController,
 			handler.NewChatHandler,
