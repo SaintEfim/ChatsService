@@ -19,7 +19,7 @@ func NewChatController(rep interfaces.Repository[entity.Chat]) interfaces.Contro
 }
 
 func (c *ChatController) Get(ctx context.Context) ([]*dto.Chat, error) {
-	var chatDtos []*dto.Chat
+	var chats []*dto.Chat
 
 	chatEntities, err := c.rep.Get(ctx)
 	if err != nil {
@@ -27,15 +27,15 @@ func (c *ChatController) Get(ctx context.Context) ([]*dto.Chat, error) {
 	}
 
 	for _, chatEntity := range chatEntities {
-		chatDto := &dto.Chat{
+		chat := &dto.Chat{
 			Id:   chatEntity.Id,
 			Name: chatEntity.Name,
 		}
 
-		chatDtos = append(chatDtos, chatDto)
+		chats = append(chats, chat)
 	}
 
-	return chatDtos, nil
+	return chats, nil
 }
 
 func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.ChatDetail, error) {
@@ -45,14 +45,14 @@ func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Cha
 		return nil, err
 	}
 
-	chatDto := &dto.ChatDetail{
+	chat := &dto.ChatDetail{
 		Id:          chatEntity.Id,
 		Name:        chatEntity.Name,
 		IsGroup:     chatEntity.IsGroup,
 		EmployeeIds: chatEntity.EmployeeIds,
 	}
 
-	return chatDto, nil
+	return chat, nil
 }
 
 func (c *ChatController) Create(ctx context.Context, chat *dto.ChatCreate) (*dto.ChatDetail, error) {

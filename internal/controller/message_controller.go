@@ -19,46 +19,46 @@ func NewMessageController(rep interfaces.Repository[entity.Message]) interfaces.
 }
 
 func (c *MessageController) Get(ctx context.Context) ([]*dto.Message, error) {
-	var chatDtos []*dto.Message
+	var messages []*dto.Message
 
-	chatEntities, err := c.rep.Get(ctx)
+	messagesEntities, err := c.rep.Get(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, chatEntity := range chatEntities {
-		chatDto := &dto.Message{
-			Id:          chatEntity.Id,
-			ChatId:      chatEntity.ChatId,
-			EmployeeId:  chatEntity.EmployeeId,
-			ColleagueId: chatEntity.ColleagueId,
-			Text:        chatEntity.Text,
-			CreatedAt:   chatEntity.CreatedAt,
+	for _, messageEntity := range messagesEntities {
+		message := &dto.Message{
+			Id:          messageEntity.Id,
+			ChatId:      messageEntity.ChatId,
+			EmployeeId:  messageEntity.EmployeeId,
+			ColleagueId: messageEntity.ColleagueId,
+			Text:        messageEntity.Text,
+			CreatedAt:   messageEntity.CreatedAt,
 		}
 
-		chatDtos = append(chatDtos, chatDto)
+		messages = append(messages, message)
 	}
 
-	return chatDtos, nil
+	return messages, nil
 }
 
 func (c *MessageController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Message, error) {
-	chatEntity, err := c.rep.GetOneById(ctx, id)
+	messageEntity, err := c.rep.GetOneById(ctx, id)
 
 	if err != nil {
 		return nil, err
 	}
 
-	chatDto := &dto.Message{
-		Id:          chatEntity.Id,
-		ChatId:      chatEntity.ChatId,
-		EmployeeId:  chatEntity.EmployeeId,
-		ColleagueId: chatEntity.ColleagueId,
-		Text:        chatEntity.Text,
-		CreatedAt:   chatEntity.CreatedAt,
+	message := &dto.Message{
+		Id:          messageEntity.Id,
+		ChatId:      messageEntity.ChatId,
+		EmployeeId:  messageEntity.EmployeeId,
+		ColleagueId: messageEntity.ColleagueId,
+		Text:        messageEntity.Text,
+		CreatedAt:   messageEntity.CreatedAt,
 	}
 
-	return chatDto, nil
+	return message, nil
 }
 
 func (c *MessageController) Create(ctx context.Context, chat *dto.MessageCreate) (*dto.Message, error) {
