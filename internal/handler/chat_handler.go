@@ -11,10 +11,10 @@ import (
 )
 
 type ChatHandler struct {
-	controller interfaces.Controller[dto.Chat, dto.ChatDetail, dto.ChatCreate, dto.ChatUpdate]
+	controller interfaces.ChatController
 }
 
-func NewChatHandler(controller interfaces.Controller[dto.Chat, dto.ChatDetail, dto.ChatCreate, dto.ChatUpdate]) interfaces.Handler[dto.Chat] {
+func NewChatHandler(controller interfaces.ChatController) interfaces.Handler[dto.Chat] {
 	return &ChatHandler{controller: controller}
 }
 
@@ -102,7 +102,13 @@ func (h *ChatHandler) Create(c *gin.Context) {
 		return
 	}
 
-	createItem, err := h.controller.Create(ctx, chatCreate)
+	chatDetail := &dto.ChatDetail{
+		Name:        chatCreate.Name,
+		IsGroup:     chatCreate.IsGroup,
+		EmployeeIds: chatCreate.EmployeeIds,
+	}
+
+	createItem, err := h.controller.Create(ctx, chatDetail)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Error{
 			Status:      http.StatusInternalServerError,
@@ -177,7 +183,12 @@ func (h *ChatHandler) Update(c *gin.Context) {
 		return
 	}
 
-	if err := h.controller.Update(ctx, id, chatUpdate); err != nil {
+	chatDetail := &dto.ChatDetail{
+		Name:        chatUpdate.Name,
+		EmployeeIds: chatUpdate.EmployeeIds,
+	}
+
+	if err := h.controller.Update(ctx, id, chatDetail); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Error{
 			Status:      http.StatusInternalServerError,
 			Description: err.Error(),

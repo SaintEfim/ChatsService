@@ -14,12 +14,12 @@ type MessageController struct {
 	rep interfaces.Repository[entity.Message]
 }
 
-func NewMessageController(rep interfaces.Repository[entity.Message]) interfaces.Controller[dto.Message, dto.Message, dto.MessageCreate, dto.MessageUpdate] {
+func NewMessageController(rep interfaces.Repository[entity.Message]) interfaces.MessageController {
 	return &MessageController{rep: rep}
 }
 
 func (c *MessageController) Get(ctx context.Context) ([]*dto.Message, error) {
-	var messages []*dto.Message
+	messages := make([]*dto.Message, 0)
 
 	messagesEntities, err := c.rep.Get(ctx)
 	if err != nil {
@@ -61,7 +61,7 @@ func (c *MessageController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.
 	return message, nil
 }
 
-func (c *MessageController) Create(ctx context.Context, chat *dto.MessageCreate) (*dto.Message, error) {
+func (c *MessageController) Create(ctx context.Context, chat *dto.Message) (*dto.Message, error) {
 	createRes, err := c.rep.Create(ctx, &entity.Message{
 		ChatId:      chat.ChatId,
 		EmployeeId:  chat.EmployeeId,
@@ -92,7 +92,7 @@ func (c *MessageController) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (c *MessageController) Update(ctx context.Context, id uuid.UUID, chat *dto.MessageUpdate) error {
+func (c *MessageController) Update(ctx context.Context, id uuid.UUID, chat *dto.Message) error {
 	err := c.rep.Update(ctx, id, &entity.Message{
 		Text: chat.Text,
 	})

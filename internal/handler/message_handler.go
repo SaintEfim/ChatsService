@@ -11,10 +11,10 @@ import (
 )
 
 type MessageHandler struct {
-	controller interfaces.Controller[dto.Message, dto.Message, dto.MessageCreate, dto.MessageUpdate]
+	controller interfaces.MessageController
 }
 
-func NewMessageHandler(controller interfaces.Controller[dto.Message, dto.Message, dto.MessageCreate, dto.MessageUpdate]) interfaces.Handler[dto.Message] {
+func NewMessageHandler(controller interfaces.MessageController) interfaces.Handler[dto.Message] {
 	return &MessageHandler{controller: controller}
 }
 
@@ -100,7 +100,14 @@ func (h *MessageHandler) Create(c *gin.Context) {
 		return
 	}
 
-	createItem, err := h.controller.Create(ctx, messageCreate)
+	messageDetail := &dto.Message{
+		ChatId:      messageCreate.ChatId,
+		EmployeeId:  messageCreate.EmployeeId,
+		ColleagueId: messageCreate.ColleagueId,
+		Text:        messageCreate.Text,
+	}
+
+	createItem, err := h.controller.Create(ctx, messageDetail)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Error{
 			Status:      http.StatusInternalServerError,
@@ -175,7 +182,11 @@ func (h *MessageHandler) Update(c *gin.Context) {
 		return
 	}
 
-	if err := h.controller.Update(ctx, id, messageUpdate); err != nil {
+	messageDetail := &dto.Message{
+		Text: messageUpdate.Text,
+	}
+
+	if err := h.controller.Update(ctx, id, messageDetail); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Error{
 			Status:      http.StatusInternalServerError,
 			Description: err.Error(),

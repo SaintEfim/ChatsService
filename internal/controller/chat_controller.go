@@ -14,12 +14,12 @@ type ChatController struct {
 	rep interfaces.Repository[entity.Chat]
 }
 
-func NewChatController(rep interfaces.Repository[entity.Chat]) interfaces.Controller[dto.Chat, dto.ChatDetail, dto.ChatCreate, dto.ChatUpdate] {
+func NewChatController(rep interfaces.Repository[entity.Chat]) interfaces.ChatController {
 	return &ChatController{rep: rep}
 }
 
 func (c *ChatController) Get(ctx context.Context) ([]*dto.Chat, error) {
-	var chats []*dto.Chat
+	chats := make([]*dto.Chat, 0)
 
 	chatEntities, err := c.rep.Get(ctx)
 	if err != nil {
@@ -55,7 +55,7 @@ func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Cha
 	return chat, nil
 }
 
-func (c *ChatController) Create(ctx context.Context, chat *dto.ChatCreate) (*dto.ChatDetail, error) {
+func (c *ChatController) Create(ctx context.Context, chat *dto.ChatDetail) (*dto.ChatDetail, error) {
 	createRes, err := c.rep.Create(ctx, &entity.Chat{
 		Name:        chat.Name,
 		IsGroup:     chat.IsGroup,
@@ -84,7 +84,7 @@ func (c *ChatController) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (c *ChatController) Update(ctx context.Context, id uuid.UUID, chat *dto.ChatUpdate) error {
+func (c *ChatController) Update(ctx context.Context, id uuid.UUID, chat *dto.ChatDetail) error {
 	err := c.rep.Update(ctx, id, &entity.Chat{
 		Name:        chat.Name,
 		EmployeeIds: chat.EmployeeIds,

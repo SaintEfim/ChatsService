@@ -6,15 +6,15 @@ definitions:
       name:
         type: string
     required:
-    - id
-    - name
+      - id
+      - name
     type: object
   dto.CreateActionDto:
     properties:
       id:
         type: string
     required:
-    - id
+      - id
     type: object
   dto.CreateChatDto:
     properties:
@@ -27,7 +27,7 @@ definitions:
       name:
         type: string
     required:
-    - name
+      - name
     type: object
   dto.CreateMessageDto:
     properties:
@@ -40,10 +40,10 @@ definitions:
       text:
         type: string
     required:
-    - chat_id
-    - colleague_id
-    - employee_id
-    - text
+      - chat_id
+      - colleague_id
+      - employee_id
+      - text
     type: object
   dto.ErrorDto:
     properties:
@@ -54,8 +54,8 @@ definitions:
       status:
         type: integer
     required:
-    - description
-    - status
+      - description
+      - status
     type: object
   dto.MessageDto:
     properties:
@@ -72,12 +72,12 @@ definitions:
       text:
         type: string
     required:
-    - chat_id
-    - colleague_id
-    - created_at
-    - employee_id
-    - id
-    - text
+      - chat_id
+      - colleague_id
+      - created_at
+      - employee_id
+      - id
+      - text
     type: object
   dto.UpdateChatDto:
     properties:
@@ -93,17 +93,17 @@ definitions:
       text:
         type: string
     required:
-    - text
+      - text
     type: object
 info:
-  contact: {}
+  contact: { }
 paths:
   /api/v1/chats:
     get:
       consumes:
-      - application/json
+        - application/json
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -116,19 +116,19 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorDto'
       tags:
-      - Chats
+        - Chats
     post:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: Chat info
-        in: body
-        name: chat
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CreateChatDto'
+        - description: Chat info
+          in: body
+          name: chat
+          required: true
+          schema:
+            $ref: '#/definitions/dto.CreateChatDto'
       produces:
-      - application/json
+        - application/json
       responses:
         "201":
           description: Created
@@ -143,19 +143,19 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorDto'
       tags:
-      - Chats
+        - Chats
   /api/v1/chats/{id}:
     delete:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: Chat ID
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: Chat ID
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "204":
           description: No Content
@@ -168,18 +168,18 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorDto'
       tags:
-      - Chats
+        - Chats
     get:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: Chat ID
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: Chat ID
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -194,24 +194,24 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorDto'
       tags:
-      - Chats
+        - Chats
     put:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: Chat ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Chat info
-        in: body
-        name: chat
-        required: true
-        schema:
-          $ref: '#/definitions/dto.UpdateChatDto'
+        - description: Chat ID
+          in: path
+          name: id
+          required: true
+          type: string
+        - description: Chat info
+          in: body
+          name: chat
+          required: true
+          schema:
+            $ref: '#/definitions/dto.UpdateChatDto'
       produces:
-      - application/json
+        - application/json
       responses:
         "204":
           description: No Content
@@ -228,13 +228,13 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorDto'
       tags:
-      - Chats
+        - Chats
   /api/v1/messages:
     get:
       consumes:
-      - application/json
+        - application/json
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -247,19 +247,19 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorDto'
       tags:
-      - Messages
+        - Messages
     post:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: Message info
-        in: body
-        name: message
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CreateMessageDto'
+        - description: Message info
+          in: body
+          name: message
+          required: true
+          schema:
+            $ref: '#/definitions/dto.CreateMessageDto'
       produces:
-      - application/json
+        - application/json
       responses:
         "201":
           description: Created
@@ -274,19 +274,19 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorDto'
       tags:
-      - Messages
+        - Messages
   /api/v1/messages/{id}:
     delete:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: Message ID
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: Message ID
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "204":
           description: No Content
@@ -299,18 +299,18 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorDto'
       tags:
-      - Messages
+        - Messages
     get:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: Message ID
-        in: path
-        name: id
-        required: true
-        type: string
+        - description: Message ID
+          in: path
+          name: id
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
@@ -325,24 +325,24 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorDto'
       tags:
-      - Messages
+        - Messages
     put:
       consumes:
-      - application/json
+        - application/json
       parameters:
-      - description: Message ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Message info
-        in: body
-        name: message
-        required: true
-        schema:
-          $ref: '#/definitions/dto.UpdateMessageDto'
+        - description: Message ID
+          in: path
+          name: id
+          required: true
+          type: string
+        - description: Message info
+          in: body
+          name: message
+          required: true
+          schema:
+            $ref: '#/definitions/dto.UpdateMessageDto'
       produces:
-      - application/json
+        - application/json
       responses:
         "204":
           description: No Content
@@ -359,5 +359,5 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorDto'
       tags:
-      - Messages
+        - Messages
 swagger: "2.0"
