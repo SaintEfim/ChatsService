@@ -1,13 +1,13 @@
 package postgres
 
 import (
-	"ChatsService/config"
-	"ChatsService/internal/models/entity"
-
 	"github.com/only1nft/gormzap"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"ChatsService/config"
+	"ChatsService/internal/models/entity"
 )
 
 func ConnectToDB(cfg *config.Config, logger *zap.Logger) (*gorm.DB, error) {

@@ -1,10 +1,11 @@
 package interfaces
 
 import (
-	"ChatsService/internal/models/dto"
 	"context"
 
 	"github.com/google/uuid"
+
+	"ChatsService/internal/models/dto"
 )
 
 type ChatController interface {

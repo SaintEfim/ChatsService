@@ -6,16 +6,16 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.uber.org/zap"
+
 	"ChatsService/config"
 	"ChatsService/docs"
 	"ChatsService/internal/middleware"
 	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/interfaces"
-
-	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-	"go.uber.org/zap"
 )
 
 type Server struct {

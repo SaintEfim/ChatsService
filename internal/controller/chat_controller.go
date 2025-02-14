@@ -3,11 +3,11 @@ package controller
 import (
 	"context"
 
+	"github.com/google/uuid"
+
 	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
-
-	"github.com/google/uuid"
 )
 
 type ChatController struct {

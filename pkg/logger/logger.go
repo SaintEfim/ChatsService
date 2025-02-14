@@ -3,11 +3,11 @@ package logger
 import (
 	"os"
 
-	"ChatsService/config"
-
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+
+	"ChatsService/config"
 )
 
 func NewLogger(logInfo *config.Config) *zap.Logger {

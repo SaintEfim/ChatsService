@@ -3,9 +3,9 @@ package server
 import (
 	"net/http"
 
-	"ChatsService/config"
-
 	"github.com/rs/cors"
+
+	"ChatsService/config"
 )
 
 func CorsSettings(cfg *config.Config) *cors.Cors {

@@ -3,11 +3,11 @@ package repository
 import (
 	"context"
 
-	"ChatsService/internal/models/entity"
-	"ChatsService/internal/models/interfaces"
-
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+
+	"ChatsService/internal/models/entity"
+	"ChatsService/internal/models/interfaces"
 )
 
 type MessageRepository struct {
