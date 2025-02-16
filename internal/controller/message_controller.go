@@ -61,7 +61,7 @@ func (c *MessageController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.
 	return message, nil
 }
 
-func (c *MessageController) Create(ctx context.Context, chat *dto.Message) (*dto.Message, error) {
+func (c *MessageController) Create(ctx context.Context, chat *dto.MessageCreate) (*dto.Message, error) {
 	createRes, err := c.rep.Create(ctx, &entity.Message{
 		ChatId:      chat.ChatId,
 		EmployeeId:  chat.EmployeeId,
@@ -92,7 +92,7 @@ func (c *MessageController) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (c *MessageController) Update(ctx context.Context, id uuid.UUID, chat *dto.Message) error {
+func (c *MessageController) Update(ctx context.Context, id uuid.UUID, chat *dto.MessageUpdate) error {
 	err := c.rep.Update(ctx, id, &entity.Message{
 		Text: chat.Text,
 	})
