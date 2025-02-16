@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"ChatsService/internal/controller/validation"
 	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
@@ -55,7 +56,12 @@ func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Cha
 	return chat, nil
 }
 
-func (c *ChatController) Create(ctx context.Context, chat *dto.ChatDetail) (*dto.ChatDetail, error) {
+func (c *ChatController) Create(ctx context.Context, chat *dto.ChatCreate) (*dto.ChatDetail, error) {
+	validate := validation.NewValidator()
+	if err := validate.Struct(chat); err != nil {
+		return nil, err
+	}
+
 	createRes, err := c.rep.Create(ctx, &entity.Chat{
 		Name:        chat.Name,
 		IsGroup:     chat.IsGroup,
@@ -84,7 +90,7 @@ func (c *ChatController) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (c *ChatController) Update(ctx context.Context, id uuid.UUID, chat *dto.ChatDetail) error {
+func (c *ChatController) Update(ctx context.Context, id uuid.UUID, chat *dto.ChatUpdate) error {
 	err := c.rep.Update(ctx, id, &entity.Chat{
 		Name:        chat.Name,
 		EmployeeIds: chat.EmployeeIds,

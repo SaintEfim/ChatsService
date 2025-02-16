@@ -100,14 +100,7 @@ func (h *MessageHandler) Create(c *gin.Context) {
 		return
 	}
 
-	messageDetail := &dto.Message{
-		ChatId:      messageCreate.ChatId,
-		EmployeeId:  messageCreate.EmployeeId,
-		ColleagueId: messageCreate.ColleagueId,
-		Text:        messageCreate.Text,
-	}
-
-	createItem, err := h.controller.Create(ctx, messageDetail)
+	createItem, err := h.controller.Create(ctx, messageCreate)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Error{
 			Status:      http.StatusInternalServerError,
@@ -182,11 +175,7 @@ func (h *MessageHandler) Update(c *gin.Context) {
 		return
 	}
 
-	messageDetail := &dto.Message{
-		Text: messageUpdate.Text,
-	}
-
-	if err := h.controller.Update(ctx, id, messageDetail); err != nil {
+	if err := h.controller.Update(ctx, id, messageUpdate); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Error{
 			Status:      http.StatusInternalServerError,
 			Description: err.Error(),
