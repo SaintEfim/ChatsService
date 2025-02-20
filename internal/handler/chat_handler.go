@@ -20,6 +20,7 @@ func NewChatHandler(controller interfaces.ChatController) interfaces.Handler[dto
 
 func (h *ChatHandler) ConfigureRoutes(r *gin.Engine) {
 	r.GET("/api/v1/chats", h.Get)
+	r.GET("/api/v1/chats/user/:id", h.GetChatsByUserId)
 	r.GET("/api/v1/chats/:id", h.GetOneById)
 	r.POST("/api/v1/chats", h.Create)
 	r.DELETE("/api/v1/chats/:id", h.Delete)
@@ -37,6 +38,38 @@ func (h *ChatHandler) Get(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	chats, err := h.controller.Get(ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.Error{
+			Status:      http.StatusInternalServerError,
+			Description: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, chats)
+}
+
+// GetChatsByUserId @Summary Get chats by User ID
+// @Tags Chats
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Success 200 {object} []dto.Chat
+// @Failure 500 {object} dto.Error
+// @Router /api/v1/chats/user/{id} [get]
+func (h *ChatHandler) GetChatsByUserId(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, dto.Error{
+			Status:      http.StatusBadRequest,
+			Description: err.Error(),
+		})
+		return
+	}
+
+	chats, err := h.controller.GetChatsByUserId(ctx, id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Error{
 			Status:      http.StatusInternalServerError,
@@ -85,7 +118,7 @@ func (h *ChatHandler) GetOneById(c *gin.Context) {
 // @Tags Chats
 // @Accept json
 // @Produce json
-// @Param chat body dto.CreateChatDto true "Chat info"
+// @Param chat body dto.ChatCreate true "Chat info"
 // @Success 201 {object} uuid.UUID
 // @Failure 400 {object} dto.Error
 // @Failure 500 {object} dto.Error
@@ -150,7 +183,7 @@ func (h *ChatHandler) Delete(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "Chat ID"
-// @Param chat body dto.UpdateChatDto true "Chat info"
+// @Param chat body dto.ChatUpdate true "Chat info"
 // @Success 204 "No Content"
 // @Failure 400 {object} dto.Error
 // @Failure 404 {object} dto.Error

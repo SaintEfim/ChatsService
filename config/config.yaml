@@ -1,6 +1,6 @@
 HTTPServer:
   Addr: "localhost"
-  Port: "1000"
+  Port: "1006"
 EnvironmentVariables:
   Environment: "development"
 DataBase:

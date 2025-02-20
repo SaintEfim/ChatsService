@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ChatsService/internal/controller/validation"
 	"context"
 
 	"go.uber.org/fx"
@@ -74,6 +75,7 @@ func main() {
 		fx.Provide(
 			logger.NewLogger,
 			postgres.ConnectToDB,
+			validation.NewValidator,
 			repository.NewChatRepository,
 			repository.NewMessageRepository,
 			controller.NewChatController,

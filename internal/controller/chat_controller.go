@@ -3,12 +3,12 @@ package controller
 import (
 	"context"
 
-	"github.com/google/uuid"
-
 	"ChatsService/internal/controller/validation"
 	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
+
+	"github.com/google/uuid"
 )
 
 type ChatController struct {
@@ -39,6 +39,28 @@ func (c *ChatController) Get(ctx context.Context) ([]*dto.Chat, error) {
 	return chats, nil
 }
 
+func (c *ChatController) GetChatsByUserId(ctx context.Context, userId uuid.UUID) ([]*dto.Chat, error) {
+	chats := make([]*dto.Chat, 0)
+
+	chatEntities, err := c.rep.Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, chatEntity := range chatEntities {
+		if chatEntity.EmployeeIds.Contains(userId) {
+			chat := &dto.Chat{
+				Id:   chatEntity.Id,
+				Name: chatEntity.Name,
+			}
+
+			chats = append(chats, chat)
+		}
+	}
+
+	return chats, nil
+}
+
 func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.ChatDetail, error) {
 	chatEntity, err := c.rep.GetOneById(ctx, id)
 
@@ -57,7 +79,7 @@ func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Cha
 }
 
 func (c *ChatController) Create(ctx context.Context, chat *dto.ChatCreate) (*dto.ChatDetail, error) {
-	validate := validation.NewValidator()
+	validate := validation.NewValidator(c.rep)
 	if err := validate.Struct(chat); err != nil {
 		return nil, err
 	}

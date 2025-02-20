@@ -32,14 +32,14 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/dto.ChatDto"
+                                "$ref": "#/definitions/dto.Chat"
                             }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     }
                 }
@@ -61,7 +61,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateChatDto"
+                            "$ref": "#/definitions/dto.ChatCreate"
                         }
                     }
                 ],
@@ -69,19 +69,58 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateActionDto"
+                            "type": "string"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/chats/user/{id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chats"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.Chat"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Error"
                         }
                     }
                 }
@@ -111,19 +150,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ChatDto"
+                            "$ref": "#/definitions/dto.ChatDetail"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     }
                 }
@@ -152,7 +191,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UpdateChatDto"
+                            "$ref": "#/definitions/dto.ChatUpdate"
                         }
                     }
                 ],
@@ -163,19 +202,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     }
                 }
@@ -206,13 +245,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     }
                 }
@@ -235,14 +274,14 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/dto.MessageDto"
+                                "$ref": "#/definitions/dto.Message"
                             }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     }
                 }
@@ -264,7 +303,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateMessageDto"
+                            "$ref": "#/definitions/dto.MessageCreate"
                         }
                     }
                 ],
@@ -272,19 +311,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateActionDto"
+                            "type": "string"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     }
                 }
@@ -314,19 +353,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.MessageDto"
+                            "$ref": "#/definitions/dto.Message"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     }
                 }
@@ -355,7 +394,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UpdateMessageDto"
+                            "$ref": "#/definitions/dto.MessageUpdate"
                         }
                     }
                 ],
@@ -366,19 +405,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     }
                 }
@@ -409,13 +448,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/dto.ErrorDto"
+                            "$ref": "#/definitions/dto.Error"
                         }
                     }
                 }
@@ -423,11 +462,10 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dto.ChatDto": {
+        "dto.Chat": {
             "type": "object",
             "required": [
-                "id",
-                "name"
+                "id"
             ],
             "properties": {
                 "id": {
@@ -438,22 +476,8 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.CreateActionDto": {
+        "dto.ChatCreate": {
             "type": "object",
-            "required": [
-                "id"
-            ],
-            "properties": {
-                "id": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.CreateChatDto": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
             "properties": {
                 "employee_ids": {
                     "type": "array",
@@ -469,30 +493,44 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.CreateMessageDto": {
+        "dto.ChatDetail": {
             "type": "object",
             "required": [
-                "chat_id",
-                "colleague_id",
-                "employee_id",
-                "text"
+                "id"
             ],
             "properties": {
-                "chat_id": {
+                "employee_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
                     "type": "string"
                 },
-                "colleague_id": {
-                    "type": "string"
+                "is_group": {
+                    "type": "boolean"
                 },
-                "employee_id": {
-                    "type": "string"
-                },
-                "text": {
+                "name": {
                     "type": "string"
                 }
             }
         },
-        "dto.ErrorDto": {
+        "dto.ChatUpdate": {
+            "type": "object",
+            "properties": {
+                "employee_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.Error": {
             "type": "object",
             "required": [
                 "description",
@@ -510,7 +548,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.MessageDto": {
+        "dto.Message": {
             "type": "object",
             "required": [
                 "chat_id",
@@ -541,21 +579,30 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.UpdateChatDto": {
+        "dto.MessageCreate": {
             "type": "object",
+            "required": [
+                "chat_id",
+                "colleague_id",
+                "employee_id",
+                "text"
+            ],
             "properties": {
-                "employee_ids": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
+                "chat_id": {
+                    "type": "string"
                 },
-                "name": {
+                "colleague_id": {
+                    "type": "string"
+                },
+                "employee_id": {
+                    "type": "string"
+                },
+                "text": {
                     "type": "string"
                 }
             }
         },
-        "dto.UpdateMessageDto": {
+        "dto.MessageUpdate": {
             "type": "object",
             "required": [
                 "text"

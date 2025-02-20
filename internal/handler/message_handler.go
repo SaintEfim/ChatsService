@@ -83,7 +83,7 @@ func (h *MessageHandler) GetOneById(c *gin.Context) {
 // @Tags Messages
 // @Accept json
 // @Produce json
-// @Param message body dto.CreateMessageDto true "Message info"
+// @Param message body dto.MessageCreate true "Message info"
 // @Success 201 {object} uuid.UUID
 // @Failure 400 {object} dto.Error
 // @Failure 500 {object} dto.Error
@@ -148,7 +148,7 @@ func (h *MessageHandler) Delete(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "Message ID"
-// @Param message body dto.UpdateMessageDto true "Message info"
+// @Param message body dto.MessageUpdate true "Message info"
 // @Success 204 "No Content"
 // @Failure 400 {object} dto.Error
 // @Failure 404 {object} dto.Error
