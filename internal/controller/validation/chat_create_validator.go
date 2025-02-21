@@ -31,8 +31,8 @@ func (v *ChatCreateValidator) registerCustomValidations() {
 	}, &dto.ChatCreate{})
 }
 
-func (v *ChatCreateValidator) ValidateStruct(s interface{}) error {
-	return v.validate.Struct(s)
+func (v *ChatCreateValidator) ValidateStruct(chat *dto.ChatCreate) error {
+	return v.validate.Struct(chat)
 }
 
 func reportError(fl validator.StructLevel, field interface{}, fieldName, message string) {

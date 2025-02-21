@@ -80,7 +80,7 @@ func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Cha
 }
 
 func (c *ChatController) Create(ctx context.Context, chat *dto.ChatCreate) (*dto.ChatDetail, error) {
-	if err := c.validator.ValidateStruct(c.rep); err != nil {
+	if err := c.validator.ValidateStruct(chat); err != nil {
 		return nil, err
 	}
 
