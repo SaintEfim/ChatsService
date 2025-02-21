@@ -42,6 +42,32 @@ func (c *MessageController) Get(ctx context.Context) ([]*dto.Message, error) {
 	return messages, nil
 }
 
+func (c *MessageController) GetMessagesByChatId(ctx context.Context, chatId uuid.UUID) ([]*dto.Message, error) {
+	messages := make([]*dto.Message, 0)
+
+	messagesEntities, err := c.rep.Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, messageEntity := range messagesEntities {
+		if messageEntity.ChatId == chatId {
+			message := &dto.Message{
+				Id:          messageEntity.Id,
+				ChatId:      messageEntity.ChatId,
+				EmployeeId:  messageEntity.EmployeeId,
+				ColleagueId: messageEntity.ColleagueId,
+				Text:        messageEntity.Text,
+				CreatedAt:   messageEntity.CreatedAt,
+			}
+
+			messages = append(messages, message)
+		}
+	}
+
+	return messages, nil
+}
+
 func (c *MessageController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Message, error) {
 	messageEntity, err := c.rep.GetOneById(ctx, id)
 

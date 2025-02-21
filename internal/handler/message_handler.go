@@ -20,6 +20,7 @@ func NewMessageHandler(controller interfaces.MessageController) interfaces.Handl
 
 func (h *MessageHandler) ConfigureRoutes(r *gin.Engine) {
 	r.GET("/api/v1/messages", h.Get)
+	r.GET("/api/v1/messages/chat/:id", h.GetMessagesByChatId)
 	r.GET("/api/v1/messages/:id", h.GetOneById)
 	r.POST("/api/v1/messages", h.Create)
 	r.DELETE("/api/v1/messages/:id", h.Delete)
@@ -45,6 +46,37 @@ func (h *MessageHandler) Get(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, messages)
+}
+
+// GetMessagesByChatId @Summary Get messages by Chat ID
+// @Tags Messages
+// @Accept json
+// @Produce json
+// @Param id path string true "Message ID"
+// @Success 200 {object} []dto.Message
+// @Failure 500 {object} dto.Error
+// @Router /api/v1/messages/chat/{id} [get]
+func (h *MessageHandler) GetMessagesByChatId(c *gin.Context) {
+	ctx := c.Request.Context()
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, dto.Error{
+			Status:      http.StatusBadRequest,
+			Description: err.Error(),
+		})
+		return
+	}
+
+	message, err := h.controller.GetMessagesByChatId(ctx, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.Error{
+			Status:      http.StatusInternalServerError,
+			Description: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, message)
 }
 
 // GetOneById @Summary Get message by ID
