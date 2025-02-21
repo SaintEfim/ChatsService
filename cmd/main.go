@@ -1,20 +1,20 @@
 package main
 
 import (
-	"ChatsService/internal/controller/validation"
 	"context"
-
-	"go.uber.org/fx"
-	"gorm.io/gorm"
 
 	"ChatsService/config"
 	"ChatsService/internal/controller"
+	"ChatsService/internal/controller/validation"
 	"ChatsService/internal/handler"
 	"ChatsService/internal/models/interfaces"
 	"ChatsService/internal/postgres"
 	"ChatsService/internal/repository"
 	"ChatsService/internal/server"
 	"ChatsService/pkg/logger"
+
+	"go.uber.org/fx"
+	"gorm.io/gorm"
 )
 
 func registerPostgres(lc fx.Lifecycle, db *gorm.DB) {
