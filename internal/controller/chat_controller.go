@@ -12,11 +12,12 @@ import (
 )
 
 type ChatController struct {
-	rep interfaces.Repository[entity.Chat]
+	validator *validation.ChatCreateValidator
+	rep       interfaces.Repository[entity.Chat]
 }
 
-func NewChatController(rep interfaces.Repository[entity.Chat]) interfaces.ChatController {
-	return &ChatController{rep: rep}
+func NewChatController(validator *validation.ChatCreateValidator, rep interfaces.Repository[entity.Chat]) interfaces.ChatController {
+	return &ChatController{validator: validator, rep: rep}
 }
 
 func (c *ChatController) Get(ctx context.Context) ([]*dto.Chat, error) {
@@ -79,8 +80,7 @@ func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Cha
 }
 
 func (c *ChatController) Create(ctx context.Context, chat *dto.ChatCreate) (*dto.ChatDetail, error) {
-	validate := validation.NewValidator(c.rep)
-	if err := validate.Struct(chat); err != nil {
+	if err := c.validator.ValidateStruct(c.rep); err != nil {
 		return nil, err
 	}
 

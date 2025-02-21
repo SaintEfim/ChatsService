@@ -75,7 +75,7 @@ func main() {
 		fx.Provide(
 			logger.NewLogger,
 			postgres.ConnectToDB,
-			validation.NewValidator,
+			validation.NewChatCreateValidator,
 			repository.NewChatRepository,
 			repository.NewMessageRepository,
 			controller.NewChatController,

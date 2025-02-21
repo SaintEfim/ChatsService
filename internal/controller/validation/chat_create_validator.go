@@ -11,6 +11,30 @@ import (
 	"github.com/google/uuid"
 )
 
+type ChatCreateValidator struct {
+	validate *validator.Validate
+	chatRepo interfaces.Repository[entity.Chat]
+}
+
+func NewChatCreateValidator(chatRepo interfaces.Repository[entity.Chat]) *ChatCreateValidator {
+	validator := &ChatCreateValidator{
+		validate: validator.New(),
+		chatRepo: chatRepo,
+	}
+	validator.registerCustomValidations()
+	return validator
+}
+
+func (v *ChatCreateValidator) registerCustomValidations() {
+	v.validate.RegisterStructValidation(func(fl validator.StructLevel) {
+		v.validateChatCreateStruct(fl, v.chatRepo)
+	}, &dto.ChatCreate{})
+}
+
+func (v *ChatCreateValidator) ValidateStruct(s interface{}) error {
+	return v.validate.Struct(s)
+}
+
 func reportError(fl validator.StructLevel, field interface{}, fieldName, message string) {
 	fl.ReportError(field, fieldName, "", message, "")
 }
@@ -27,7 +51,7 @@ func areUUIDSlicesEqual(a, b []uuid.UUID) bool {
 	return true
 }
 
-func ValidateChatCreateStruct(fl validator.StructLevel, chatRepository interfaces.Repository[entity.Chat]) {
+func (v *ChatCreateValidator) validateChatCreateStruct(fl validator.StructLevel, chatRepository interfaces.Repository[entity.Chat]) {
 	ctx := context.Background()
 	chat := fl.Current().Interface().(dto.ChatCreate)
 
@@ -57,12 +81,4 @@ func ValidateChatCreateStruct(fl validator.StructLevel, chatRepository interface
 			return
 		}
 	}
-}
-
-func NewValidator(chatRepo interfaces.Repository[entity.Chat]) *validator.Validate {
-	v := validator.New()
-	v.RegisterStructValidation(func(fl validator.StructLevel) {
-		ValidateChatCreateStruct(fl, chatRepo)
-	}, &dto.ChatCreate{})
-	return v
 }
