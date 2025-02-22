@@ -6,6 +6,7 @@ import (
 	"ChatsService/config"
 	"ChatsService/internal/controller"
 	"ChatsService/internal/controller/validation"
+	"ChatsService/internal/delivery/grpc"
 	"ChatsService/internal/handler"
 	"ChatsService/internal/models/interfaces"
 	"ChatsService/internal/postgres"
@@ -64,6 +65,13 @@ func registerServer(ctx context.Context, lifecycle fx.Lifecycle, srv interfaces.
 	})
 }
 
+func registerGRPCClient(lc fx.Lifecycle, client interfaces.EmployeeGrpc) {
+	lc.Append(fx.Hook{
+		OnStart: client.Initialize,
+		OnStop:  client.Close,
+	})
+}
+
 func main() {
 	fx.New(
 		fx.Provide(func() context.Context {
@@ -75,7 +83,8 @@ func main() {
 		fx.Provide(
 			logger.NewLogger,
 			postgres.ConnectToDB,
-			validation.NewChatCreateValidator,
+			grpc.NewEmployeeGrpcClient,
+			validation.NewChatValidator,
 			repository.NewChatRepository,
 			repository.NewMessageRepository,
 			controller.NewChatController,
@@ -87,5 +96,6 @@ func main() {
 		),
 		fx.Invoke(registerServer),
 		fx.Invoke(registerPostgres),
+		fx.Invoke(registerGRPCClient),
 	).Run()
 }

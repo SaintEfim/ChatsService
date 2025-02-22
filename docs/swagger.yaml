@@ -1,6 +1,10 @@
 definitions:
   dto.Chat:
     properties:
+      employees:
+        items:
+          $ref: '#/definitions/dto.Employee'
+        type: array
       id:
         type: string
       name:
@@ -21,9 +25,9 @@ definitions:
     type: object
   dto.ChatDetail:
     properties:
-      employee_ids:
+      employees:
         items:
-          type: string
+          $ref: '#/definitions/dto.Employee'
         type: array
       id:
         type: string
@@ -41,6 +45,17 @@ definitions:
           type: string
         type: array
       name:
+        type: string
+    type: object
+  dto.Employee:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      patronymic:
+        type: string
+      surname:
         type: string
     type: object
   dto.Error:
@@ -243,6 +258,14 @@ paths:
         in: path
         name: id
         required: true
+        type: string
+      - description: Employee ID for personal chat
+        in: query
+        name: colleagueId
+        type: string
+      - description: Flag, group chat or not (true/false)
+        in: query
+        name: is_group
         type: string
       produces:
       - application/json

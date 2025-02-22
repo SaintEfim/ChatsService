@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -54,13 +55,15 @@ func (h *ChatHandler) Get(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path string true "User ID"
+// @Param colleagueId query string false "Employee ID for personal chat"
+// @Param is_group query string false "Flag, group chat or not (true/false)"
 // @Success 200 {object} []dto.Chat
 // @Failure 500 {object} dto.Error
 // @Router /api/v1/chats/user/{id} [get]
 func (h *ChatHandler) GetChatsByUserId(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	id, err := uuid.Parse(c.Param("id"))
+	userId, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.Error{
 			Status:      http.StatusBadRequest,
@@ -69,7 +72,35 @@ func (h *ChatHandler) GetChatsByUserId(c *gin.Context) {
 		return
 	}
 
-	chats, err := h.controller.GetChatsByUserId(ctx, id)
+	var colleagueId *uuid.UUID = nil
+	colleagueIdStr := c.Query("colleagueId")
+	if colleagueIdStr != "" {
+		parsedColleagueId, err := uuid.Parse(colleagueIdStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, dto.Error{
+				Status:      http.StatusBadRequest,
+				Description: "Неверный формат colleagueId",
+			})
+			return
+		}
+		colleagueId = &parsedColleagueId
+	}
+
+	var isGroup *bool = nil
+	isGroupStr := c.Query("is_group")
+	if isGroupStr != "" {
+		parsedBool, err := strconv.ParseBool(isGroupStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, dto.Error{
+				Status:      http.StatusBadRequest,
+				Description: "Неверный формат is_group",
+			})
+			return
+		}
+		isGroup = &parsedBool
+	}
+
+	chats, err := h.controller.GetChatsByUserId(ctx, userId, colleagueId, isGroup)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Error{
 			Status:      http.StatusInternalServerError,

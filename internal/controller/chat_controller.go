@@ -2,22 +2,27 @@ package controller
 
 import (
 	"context"
+	"fmt"
 
 	"ChatsService/internal/controller/validation"
 	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
+	"ChatsService/proto/employee"
 
 	"github.com/google/uuid"
 )
 
 type ChatController struct {
-	validator *validation.ChatCreateValidator
-	rep       interfaces.Repository[entity.Chat]
+	chatValidator  *validation.ChatValidator
+	rep            interfaces.Repository[entity.Chat]
+	employeeClient interfaces.EmployeeGrpc
 }
 
-func NewChatController(validator *validation.ChatCreateValidator, rep interfaces.Repository[entity.Chat]) interfaces.ChatController {
-	return &ChatController{validator: validator, rep: rep}
+func NewChatController(chatValidator *validation.ChatValidator,
+	rep interfaces.Repository[entity.Chat],
+	employeeClient interfaces.EmployeeGrpc) interfaces.ChatController {
+	return &ChatController{chatValidator: chatValidator, rep: rep, employeeClient: employeeClient}
 }
 
 func (c *ChatController) Get(ctx context.Context) ([]*dto.Chat, error) {
@@ -29,9 +34,15 @@ func (c *ChatController) Get(ctx context.Context) ([]*dto.Chat, error) {
 	}
 
 	for _, chatEntity := range chatEntities {
+		employees, err := c.fetchEmployees(ctx, chatEntity.EmployeeIds)
+		if err != nil {
+			return nil, err
+		}
+
 		chat := &dto.Chat{
-			Id:   chatEntity.Id,
-			Name: chatEntity.Name,
+			Id:        chatEntity.Id,
+			Name:      chatEntity.Name,
+			Employees: employees,
 		}
 
 		chats = append(chats, chat)
@@ -40,7 +51,7 @@ func (c *ChatController) Get(ctx context.Context) ([]*dto.Chat, error) {
 	return chats, nil
 }
 
-func (c *ChatController) GetChatsByUserId(ctx context.Context, userId uuid.UUID) ([]*dto.Chat, error) {
+func (c *ChatController) GetChatsByUserId(ctx context.Context, userId uuid.UUID, colleagueId *uuid.UUID, isGroup *bool) ([]*dto.Chat, error) {
 	chats := make([]*dto.Chat, 0)
 
 	chatEntities, err := c.rep.Get(ctx)
@@ -49,14 +60,38 @@ func (c *ChatController) GetChatsByUserId(ctx context.Context, userId uuid.UUID)
 	}
 
 	for _, chatEntity := range chatEntities {
-		if chatEntity.EmployeeIds.Contains(userId) {
-			chat := &dto.Chat{
-				Id:   chatEntity.Id,
-				Name: chatEntity.Name,
-			}
-
-			chats = append(chats, chat)
+		if !chatEntity.EmployeeIds.Contains(userId) {
+			continue
 		}
+
+		if isGroup != nil && chatEntity.IsGroup != *isGroup {
+			continue
+		}
+
+		if colleagueId != nil {
+			if !chatEntity.IsGroup {
+				if len(chatEntity.EmployeeIds) != 2 || !chatEntity.EmployeeIds.Contains(*colleagueId) {
+					continue
+				}
+			} else {
+				if !chatEntity.EmployeeIds.Contains(*colleagueId) {
+					continue
+				}
+			}
+		}
+
+		employees, err := c.fetchEmployees(ctx, chatEntity.EmployeeIds)
+		if err != nil {
+			return nil, err
+		}
+
+		chat := &dto.Chat{
+			Id:        chatEntity.Id,
+			Name:      chatEntity.Name,
+			Employees: employees,
+		}
+
+		chats = append(chats, chat)
 	}
 
 	return chats, nil
@@ -64,23 +99,27 @@ func (c *ChatController) GetChatsByUserId(ctx context.Context, userId uuid.UUID)
 
 func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.ChatDetail, error) {
 	chatEntity, err := c.rep.GetOneById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
 
+	employees, err := c.fetchEmployees(ctx, chatEntity.EmployeeIds)
 	if err != nil {
 		return nil, err
 	}
 
 	chat := &dto.ChatDetail{
-		Id:          chatEntity.Id,
-		Name:        chatEntity.Name,
-		IsGroup:     chatEntity.IsGroup,
-		EmployeeIds: chatEntity.EmployeeIds,
+		Id:        chatEntity.Id,
+		Name:      chatEntity.Name,
+		IsGroup:   chatEntity.IsGroup,
+		Employees: employees,
 	}
 
 	return chat, nil
 }
 
-func (c *ChatController) Create(ctx context.Context, chat *dto.ChatCreate) (*dto.ChatDetail, error) {
-	if err := c.validator.ValidateStruct(chat); err != nil {
+func (c *ChatController) Create(ctx context.Context, chat *dto.ChatCreate) (*dto.CreateAction, error) {
+	if err := c.chatValidator.Validate(chat); err != nil {
 		return nil, err
 	}
 
@@ -93,14 +132,11 @@ func (c *ChatController) Create(ctx context.Context, chat *dto.ChatCreate) (*dto
 		return nil, err
 	}
 
-	createItem := &dto.ChatDetail{
-		Id:          createRes.Id,
-		Name:        createRes.Name,
-		IsGroup:     createRes.IsGroup,
-		EmployeeIds: createRes.EmployeeIds,
+	createAction := &dto.CreateAction{
+		Id: createRes.Id,
 	}
 
-	return createItem, nil
+	return createAction, nil
 }
 
 func (c *ChatController) Delete(ctx context.Context, id uuid.UUID) error {
@@ -122,4 +158,24 @@ func (c *ChatController) Update(ctx context.Context, id uuid.UUID, chat *dto.Cha
 	}
 
 	return nil
+}
+func (c *ChatController) fetchEmployees(ctx context.Context, employeeIDs []uuid.UUID) ([]dto.Employee, error) {
+	ids := entity.UUIDArray(employeeIDs).ToStringSlice()
+
+	employeesResponse, err := c.employeeClient.Search(ctx, &employee.SearchRequest{Ids: ids})
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch employees: %w", err)
+	}
+
+	employees := make([]dto.Employee, len(employeesResponse.Employees))
+	for i, emp := range employeesResponse.Employees {
+		employees[i] = dto.Employee{
+			Id:         uuid.MustParse(emp.Id),
+			Name:       emp.Name,
+			Surname:    emp.Surname,
+			Patronymic: emp.Patronymic,
+		}
+	}
+
+	return employees, nil
 }

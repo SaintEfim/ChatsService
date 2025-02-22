@@ -10,8 +10,8 @@ import (
 
 type UUIDArray []uuid.UUID
 
-func (ua UUIDArray) Contains(target uuid.UUID) bool {
-	for _, id := range ua {
+func (ua *UUIDArray) Contains(target uuid.UUID) bool {
+	for _, id := range *ua {
 		if id == target {
 			return true
 		}
@@ -42,6 +42,14 @@ func (ua *UUIDArray) Scan(value interface{}) error {
 		*ua = append(*ua, id)
 	}
 	return nil
+}
+
+func (ua UUIDArray) ToStringSlice() []string {
+	strs := make([]string, len(ua))
+	for i, u := range ua {
+		strs[i] = u.String()
+	}
+	return strs
 }
 
 type Chat struct {
