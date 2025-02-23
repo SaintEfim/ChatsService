@@ -516,6 +516,7 @@ const docTemplate = `{
         "dto.Chat": {
             "type": "object",
             "required": [
+                "employees",
                 "id"
             ],
             "properties": {
@@ -535,6 +536,9 @@ const docTemplate = `{
         },
         "dto.ChatCreate": {
             "type": "object",
+            "required": [
+                "employee_ids"
+            ],
             "properties": {
                 "employee_ids": {
                     "type": "array",
@@ -553,6 +557,7 @@ const docTemplate = `{
         "dto.ChatDetail": {
             "type": "object",
             "required": [
+                "employees",
                 "id"
             ],
             "properties": {
@@ -575,6 +580,9 @@ const docTemplate = `{
         },
         "dto.ChatUpdate": {
             "type": "object",
+            "required": [
+                "employee_ids"
+            ],
             "properties": {
                 "employee_ids": {
                     "type": "array",
@@ -589,6 +597,10 @@ const docTemplate = `{
         },
         "dto.Employee": {
             "type": "object",
+            "required": [
+                "name",
+                "surname"
+            ],
             "properties": {
                 "id": {
                     "type": "string"
