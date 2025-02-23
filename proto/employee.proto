@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option go_package = "proto/employee;";
+
+package employees;
+
+service GreeterEmployees {
+  rpc Create (EmployeeCreateRequest) returns (EmployeeCreateResponse);
+  rpc Search (SearchRequest) returns (SearchResponse);
+}
+
+message EmployeeCreateRequest {
+  string name = 1;
+  string surname = 2;
+  string patronymic = 3;
+  string email = 4;
+  string password = 5;
+  string positionId = 6;
+}
+
+message EmployeeCreateResponse {
+  string Id = 1;
+}
+
+message SearchRequest {
+  repeated string ids = 1;
+}
+
+message Employee {
+  string id = 1;
+  string name = 2;
+  string surname = 3;
+  string patronymic = 4;
+}
+
+message SearchResponse {
+  repeated Employee employees = 1;
+}

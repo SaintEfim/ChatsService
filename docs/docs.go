@@ -105,6 +105,18 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Employee ID for personal chat",
+                        "name": "colleagueId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Flag, group chat or not (true/false)",
+                        "name": "is_group",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -504,9 +516,16 @@ const docTemplate = `{
         "dto.Chat": {
             "type": "object",
             "required": [
+                "employees",
                 "id"
             ],
             "properties": {
+                "employees": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.Employee"
+                    }
+                },
                 "id": {
                     "type": "string"
                 },
@@ -517,6 +536,9 @@ const docTemplate = `{
         },
         "dto.ChatCreate": {
             "type": "object",
+            "required": [
+                "employee_ids"
+            ],
             "properties": {
                 "employee_ids": {
                     "type": "array",
@@ -535,13 +557,14 @@ const docTemplate = `{
         "dto.ChatDetail": {
             "type": "object",
             "required": [
+                "employees",
                 "id"
             ],
             "properties": {
-                "employee_ids": {
+                "employees": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/dto.Employee"
                     }
                 },
                 "id": {
@@ -557,6 +580,9 @@ const docTemplate = `{
         },
         "dto.ChatUpdate": {
             "type": "object",
+            "required": [
+                "employee_ids"
+            ],
             "properties": {
                 "employee_ids": {
                     "type": "array",
@@ -565,6 +591,27 @@ const docTemplate = `{
                     }
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.Employee": {
+            "type": "object",
+            "required": [
+                "name",
+                "surname"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "patronymic": {
+                    "type": "string"
+                },
+                "surname": {
                     "type": "string"
                 }
             }

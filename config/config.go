@@ -6,6 +6,7 @@ type Config struct {
 	EnvironmentVariables EnvironmentVariables `yaml:"EnvironmentVariables"`
 	HTTPServer           HTTPServer           `yaml:"HTTPServer"`
 	DataBase             DataBase             `yaml:"DataBase"`
+	GRPCClient           GRPCClient           `yaml:"GRPCClient"`
 	Logs                 Logs                 `yaml:"Logs"`
 	Cors                 Cors                 `yaml:"Cors"`
 }
@@ -21,6 +22,10 @@ type HTTPServer struct {
 
 type DataBase struct {
 	ConnectionString string `yaml:"ConnectionString"`
+}
+
+type GRPCClient struct {
+	Services map[string]string `yaml:"Services"`
 }
 
 type Logs struct {

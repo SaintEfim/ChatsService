@@ -1,11 +1,16 @@
 definitions:
   dto.Chat:
     properties:
+      employees:
+        items:
+          $ref: '#/definitions/dto.Employee'
+        type: array
       id:
         type: string
       name:
         type: string
     required:
+    - employees
     - id
     type: object
   dto.ChatCreate:
@@ -18,12 +23,14 @@ definitions:
         type: boolean
       name:
         type: string
+    required:
+    - employee_ids
     type: object
   dto.ChatDetail:
     properties:
-      employee_ids:
+      employees:
         items:
-          type: string
+          $ref: '#/definitions/dto.Employee'
         type: array
       id:
         type: string
@@ -32,6 +39,7 @@ definitions:
       name:
         type: string
     required:
+    - employees
     - id
     type: object
   dto.ChatUpdate:
@@ -42,6 +50,22 @@ definitions:
         type: array
       name:
         type: string
+    required:
+    - employee_ids
+    type: object
+  dto.Employee:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      patronymic:
+        type: string
+      surname:
+        type: string
+    required:
+    - name
+    - surname
     type: object
   dto.Error:
     properties:
@@ -243,6 +267,14 @@ paths:
         in: path
         name: id
         required: true
+        type: string
+      - description: Employee ID for personal chat
+        in: query
+        name: colleagueId
+        type: string
+      - description: Flag, group chat or not (true/false)
+        in: query
+        name: is_group
         type: string
       produces:
       - application/json
