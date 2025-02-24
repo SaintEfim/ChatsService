@@ -105,18 +105,6 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Employee ID for personal chat",
-                        "name": "colleagueId",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Flag, group chat or not (true/false)",
-                        "name": "is_group",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -127,6 +115,59 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/dto.Chat"
                             }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/chats/user/{user_id}/colleague/{colleague_id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chats"
+                ],
+                "summary": "Check if a chat exists",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Colleague ID",
+                        "name": "colleague_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "boolean"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Error"
                         }
                     },
                     "500": {

@@ -51,7 +51,7 @@ func (c *ChatController) Get(ctx context.Context) ([]*dto.Chat, error) {
 	return chats, nil
 }
 
-func (c *ChatController) GetChatsByUserId(ctx context.Context, userId uuid.UUID, colleagueId *uuid.UUID, isGroup *bool) ([]*dto.Chat, error) {
+func (c *ChatController) GetChatsByUserId(ctx context.Context, userId uuid.UUID) ([]*dto.Chat, error) {
 	chats := make([]*dto.Chat, 0)
 
 	chatEntities, err := c.rep.Get(ctx)
@@ -62,22 +62,6 @@ func (c *ChatController) GetChatsByUserId(ctx context.Context, userId uuid.UUID,
 	for _, chatEntity := range chatEntities {
 		if !chatEntity.EmployeeIds.Contains(userId) {
 			continue
-		}
-
-		if isGroup != nil && chatEntity.IsGroup != *isGroup {
-			continue
-		}
-
-		if colleagueId != nil {
-			if !chatEntity.IsGroup {
-				if len(chatEntity.EmployeeIds) != 2 || !chatEntity.EmployeeIds.Contains(*colleagueId) {
-					continue
-				}
-			} else {
-				if !chatEntity.EmployeeIds.Contains(*colleagueId) {
-					continue
-				}
-			}
 		}
 
 		employees, err := c.fetchEmployees(ctx, chatEntity.EmployeeIds)
@@ -95,6 +79,25 @@ func (c *ChatController) GetChatsByUserId(ctx context.Context, userId uuid.UUID,
 	}
 
 	return chats, nil
+}
+
+func (c *ChatController) PrivateChatExists(ctx context.Context, userId uuid.UUID, colleagueId uuid.UUID) (bool, error) {
+	if userId == colleagueId {
+		return false, nil
+	}
+
+	chatEntities, err := c.rep.Get(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	for _, chatEntity := range chatEntities {
+		if chatEntity.EmployeeIds.Contains(userId) && chatEntity.EmployeeIds.Contains(colleagueId) {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
 
 func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.ChatDetail, error) {
@@ -159,6 +162,7 @@ func (c *ChatController) Update(ctx context.Context, id uuid.UUID, chat *dto.Cha
 
 	return nil
 }
+
 func (c *ChatController) fetchEmployees(ctx context.Context, employeeIDs []uuid.UUID) ([]dto.Employee, error) {
 	ids := entity.UUIDArray(employeeIDs).ToStringSlice()
 
