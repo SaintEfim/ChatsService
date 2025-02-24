@@ -1,11 +1,11 @@
 package main
 
 import (
+	"ChatsService/internal/validation"
 	"context"
 
 	"ChatsService/config"
 	"ChatsService/internal/controller"
-	"ChatsService/internal/controller/validation"
 	"ChatsService/internal/delivery/grpc"
 	"ChatsService/internal/handler"
 	"ChatsService/internal/models/interfaces"

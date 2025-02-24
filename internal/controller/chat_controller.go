@@ -1,10 +1,10 @@
 package controller
 
 import (
+	"ChatsService/internal/validation"
 	"context"
 	"fmt"
 
-	"ChatsService/internal/controller/validation"
 	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
