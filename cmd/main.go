@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ChatsService/internal/validation"
+	clientValidator "ChatsService/pkg/validator"
 	"context"
 
 	"ChatsService/config"
@@ -12,8 +12,8 @@ import (
 	"ChatsService/internal/postgres"
 	"ChatsService/internal/repository"
 	"ChatsService/internal/server"
+	"ChatsService/internal/validator"
 	"ChatsService/pkg/logger"
-
 	"go.uber.org/fx"
 	"gorm.io/gorm"
 )
@@ -45,23 +45,8 @@ func registerPostgres(lc fx.Lifecycle, db *gorm.DB) {
 
 func registerServer(ctx context.Context, lifecycle fx.Lifecycle, srv interfaces.Server) {
 	lifecycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
-			var err error
-			go func() {
-				err = srv.Run(ctx)
-			}()
-
-			if err != nil {
-				return err
-			}
-			return nil
-		},
-		OnStop: func(ctx context.Context) error {
-			if err := srv.Stop(ctx); err != nil {
-				return err
-			}
-			return nil
-		},
+		OnStart: srv.Run,
+		OnStop:  srv.Stop,
 	})
 }
 
@@ -84,7 +69,7 @@ func main() {
 			logger.NewLogger,
 			postgres.ConnectToDB,
 			grpc.NewEmployeeGrpcClient,
-			validation.NewChatValidator,
+			validator.NewChatValidator,
 			repository.NewChatRepository,
 			repository.NewMessageRepository,
 			controller.NewChatController,
@@ -93,6 +78,7 @@ func main() {
 			handler.NewMessageHandler,
 			server.NewHTTPServer,
 			server.NewServer,
+			clientValidator.NewEmployeeValidator,
 		),
 		fx.Invoke(registerServer),
 		fx.Invoke(registerPostgres),

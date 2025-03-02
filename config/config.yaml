@@ -1,5 +1,5 @@
 HTTPServer:
-  Addr: "localhost"
+  Addr: "0.0.0.0"
   Port: "1006"
 EnvironmentVariables:
   Environment: "development"
@@ -7,7 +7,7 @@ DataBase:
   ConnectionString: "postgres://postgres:1234@localhost/ChatsDb?sslmode=disable"
 GRPCClient:
   Services:
-    employees: "localhost:2003"
+    employees: "0.0.0.0:2003"
 Logs:
   Path: ""
   Level: info

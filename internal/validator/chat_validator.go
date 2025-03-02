@@ -1,4 +1,4 @@
-package validation
+package validator
 
 import (
 	"context"
@@ -7,26 +7,25 @@ import (
 	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
-	"ChatsService/proto/employee"
+	clientValidator "ChatsService/pkg/validator"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )
 
 type ChatValidator struct {
-	validate       *validator.Validate
-	chatRepo       interfaces.Repository[entity.Chat]
-	employeeClient interfaces.EmployeeGrpc
+	validate          *validator.Validate
+	chatRepo          interfaces.Repository[entity.Chat]
+	employeeValidator *clientValidator.EmployeeValidator
 }
 
 func NewChatValidator(
-	chatRepo interfaces.Repository[entity.Chat],
-	employeeClient interfaces.EmployeeGrpc,
+	chatRepo interfaces.Repository[entity.Chat], employeeValidator *clientValidator.EmployeeValidator,
 ) *ChatValidator {
 	v := &ChatValidator{
-		validate:       validator.New(),
-		chatRepo:       chatRepo,
-		employeeClient: employeeClient,
+		validate:          validator.New(),
+		chatRepo:          chatRepo,
+		employeeValidator: employeeValidator,
 	}
 
 	v.registerCustomValidations()
@@ -54,7 +53,7 @@ func (v *ChatValidator) validateChatStruct(sl validator.StructLevel) {
 	ctx := context.Background()
 	v.validatePrivateChat(sl, chat)
 	v.validateGroupChat(sl, chat)
-	v.validateEmployeesExist(ctx, sl, chat)
+	v.employeeValidator.ValidateEmployeesExist(ctx, sl, chat.EmployeeIds)
 }
 
 func (v *ChatValidator) validatePrivateChat(sl validator.StructLevel, chat dto.ChatCreate) {
@@ -114,39 +113,6 @@ func (v *ChatValidator) validateGroupChat(sl validator.StructLevel, chat dto.Cha
 			"EmployeeIDs",
 			"",
 			"group chat must have at least 1 participant",
-			"",
-		)
-	}
-}
-
-func (v *ChatValidator) validateEmployeesExist(
-	ctx context.Context,
-	sl validator.StructLevel,
-	chat dto.ChatCreate,
-) {
-	employeeIdsStr := make([]string, len(chat.EmployeeIds))
-	for i, id := range chat.EmployeeIds {
-		employeeIdsStr[i] = id.String()
-	}
-
-	exist, err := v.employeeClient.Search(ctx, &employee.SearchRequest{Ids: employeeIdsStr})
-	if err != nil {
-		sl.ReportError(
-			chat.EmployeeIds,
-			"EmployeeIDs",
-			"",
-			fmt.Sprintf("employee check failed: %v", err),
-			"",
-		)
-		return
-	}
-
-	if exist == nil {
-		sl.ReportError(
-			chat.EmployeeIds,
-			"EmployeeIDs",
-			"",
-			"one or more employees do not exist",
 			"",
 		)
 	}

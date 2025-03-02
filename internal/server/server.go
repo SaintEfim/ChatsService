@@ -46,21 +46,29 @@ func NewServer(srv *http.Server, cfg *config.Config,
 }
 
 func (s *Server) Run(ctx context.Context) error {
-	g := gin.Default()
+	var err error
 
-	g.Use(middleware.LoggingMiddleware(s.logger))
+	go func() {
+		g := gin.Default()
 
-	s.setGinMode(ctx)
-	s.configureSwagger(ctx, g)
-	s.configurationHandler(ctx, g)
+		g.Use(middleware.LoggingMiddleware(s.logger))
 
-	handler := CorsSettings(s.cfg).Handler(g)
+		s.setGinMode(ctx)
+		s.configureSwagger(ctx, g)
+		s.configurationHandler(ctx, g)
 
-	s.srv.Handler = handler
+		handler := CorsSettings(s.cfg).Handler(g)
 
-	s.logger.Sugar().Infof("Listening and serving HTTP on %s\n", s.srv.Addr)
+		s.srv.Handler = handler
 
-	if err := s.srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		s.logger.Sugar().Infof("Listening and serving HTTP on %s\n", s.srv.Addr)
+
+		if err := s.srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			s.logger.Error(err.Error())
+		}
+	}()
+
+	if err != nil {
 		return err
 	}
 

@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"ChatsService/internal/validation"
+	"ChatsService/internal/validator"
 	"context"
 	"fmt"
 
@@ -14,12 +14,12 @@ import (
 )
 
 type ChatController struct {
-	chatValidator  *validation.ChatValidator
+	chatValidator  *validator.ChatValidator
 	rep            interfaces.Repository[entity.Chat]
 	employeeClient interfaces.EmployeeGrpc
 }
 
-func NewChatController(chatValidator *validation.ChatValidator,
+func NewChatController(chatValidator *validator.ChatValidator,
 	rep interfaces.Repository[entity.Chat],
 	employeeClient interfaces.EmployeeGrpc) interfaces.ChatController {
 	return &ChatController{chatValidator: chatValidator, rep: rep, employeeClient: employeeClient}
