@@ -1,11 +1,12 @@
 package entity
 
 import (
-	"database/sql/driver"
 	"errors"
+	"strings"
+
+	"database/sql/driver"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"strings"
 )
 
 type UUIDArray []uuid.UUID
@@ -54,9 +55,9 @@ func (ua UUIDArray) ToStringSlice() []string {
 
 type Chat struct {
 	gorm.Model
-	Id          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primary_key"`
-	Name        string
-	IsGroup     bool      `gorm:"default:false"`
-	EmployeeIds UUIDArray `gorm:"type:uuid[]"`
-	Messages    []Message
+	Id             uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primary_key"`
+	Name           string
+	IsGroup        bool      `gorm:"default:false"`
+	ParticipantIds UUIDArray `gorm:"type:uuid[]"`
+	Messages       []Message
 }

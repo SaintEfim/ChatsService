@@ -35,7 +35,7 @@ func (v *EmployeeValidator) ValidateEmployeesExist(
 	if err != nil {
 		sl.ReportError(
 			"employeeId",
-			"EmployeeIDs",
+			"EmployeeIds",
 			"",
 			fmt.Sprintf("employee check failed: %v", err),
 			"",
@@ -46,7 +46,7 @@ func (v *EmployeeValidator) ValidateEmployeesExist(
 	if exist == nil {
 		sl.ReportError(
 			"employeeId",
-			"EmployeeIDs",
+			"EmployeeIds",
 			"",
 			"one or more employees do not exist",
 			"",

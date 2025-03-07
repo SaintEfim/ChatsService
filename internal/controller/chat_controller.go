@@ -1,13 +1,13 @@
 package controller
 
 import (
-	"ChatsService/internal/validator"
 	"context"
 	"fmt"
 
 	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
+	"ChatsService/internal/validator"
 	"ChatsService/proto/employee"
 
 	"github.com/google/uuid"
@@ -34,15 +34,15 @@ func (c *ChatController) Get(ctx context.Context) ([]*dto.Chat, error) {
 	}
 
 	for _, chatEntity := range chatEntities {
-		employees, err := c.fetchEmployees(ctx, chatEntity.EmployeeIds)
+		participant, err := c.fetchEmployees(ctx, chatEntity.ParticipantIds)
 		if err != nil {
 			return nil, err
 		}
 
 		chat := &dto.Chat{
-			Id:        chatEntity.Id,
-			Name:      chatEntity.Name,
-			Employees: employees,
+			Id:           chatEntity.Id,
+			Name:         chatEntity.Name,
+			Participants: participant,
 		}
 
 		chats = append(chats, chat)
@@ -60,19 +60,19 @@ func (c *ChatController) GetChatsByUserId(ctx context.Context, userId uuid.UUID)
 	}
 
 	for _, chatEntity := range chatEntities {
-		if !chatEntity.EmployeeIds.Contains(userId) {
+		if !chatEntity.ParticipantIds.Contains(userId) {
 			continue
 		}
 
-		employees, err := c.fetchEmployees(ctx, chatEntity.EmployeeIds)
+		participants, err := c.fetchEmployees(ctx, chatEntity.ParticipantIds)
 		if err != nil {
 			return nil, err
 		}
 
 		chat := &dto.Chat{
-			Id:        chatEntity.Id,
-			Name:      chatEntity.Name,
-			Employees: employees,
+			Id:           chatEntity.Id,
+			Name:         chatEntity.Name,
+			Participants: participants,
 		}
 
 		chats = append(chats, chat)
@@ -92,7 +92,7 @@ func (c *ChatController) PrivateChatExists(ctx context.Context, userId uuid.UUID
 	}
 
 	for _, chatEntity := range chatEntities {
-		if chatEntity.EmployeeIds.Contains(userId) && chatEntity.EmployeeIds.Contains(colleagueId) {
+		if chatEntity.ParticipantIds.Contains(userId) && chatEntity.ParticipantIds.Contains(colleagueId) {
 			return true, nil
 		}
 	}
@@ -106,16 +106,16 @@ func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Cha
 		return nil, err
 	}
 
-	employees, err := c.fetchEmployees(ctx, chatEntity.EmployeeIds)
+	participants, err := c.fetchEmployees(ctx, chatEntity.ParticipantIds)
 	if err != nil {
 		return nil, err
 	}
 
 	chat := &dto.ChatDetail{
-		Id:        chatEntity.Id,
-		Name:      chatEntity.Name,
-		IsGroup:   chatEntity.IsGroup,
-		Employees: employees,
+		Id:           chatEntity.Id,
+		Name:         chatEntity.Name,
+		IsGroup:      chatEntity.IsGroup,
+		Participants: participants,
 	}
 
 	return chat, nil
@@ -127,9 +127,9 @@ func (c *ChatController) Create(ctx context.Context, chat *dto.ChatCreate) (*dto
 	}
 
 	createRes, err := c.rep.Create(ctx, &entity.Chat{
-		Name:        chat.Name,
-		IsGroup:     chat.IsGroup,
-		EmployeeIds: chat.EmployeeIds,
+		Name:           chat.Name,
+		IsGroup:        chat.IsGroup,
+		ParticipantIds: chat.ParticipantIds,
 	})
 	if err != nil {
 		return nil, err
@@ -153,8 +153,8 @@ func (c *ChatController) Delete(ctx context.Context, id uuid.UUID) error {
 
 func (c *ChatController) Update(ctx context.Context, id uuid.UUID, chat *dto.ChatUpdate) error {
 	err := c.rep.Update(ctx, id, &entity.Chat{
-		Name:        chat.Name,
-		EmployeeIds: chat.EmployeeIds,
+		Name:           chat.Name,
+		ParticipantIds: chat.ParticipantIds,
 	})
 	if err != nil {
 		return err
@@ -163,7 +163,7 @@ func (c *ChatController) Update(ctx context.Context, id uuid.UUID, chat *dto.Cha
 	return nil
 }
 
-func (c *ChatController) fetchEmployees(ctx context.Context, employeeIDs []uuid.UUID) ([]dto.Employee, error) {
+func (c *ChatController) fetchEmployees(ctx context.Context, employeeIDs []uuid.UUID) ([]dto.Participant, error) {
 	ids := entity.UUIDArray(employeeIDs).ToStringSlice()
 
 	employeesResponse, err := c.employeeClient.Search(ctx, &employee.SearchRequest{Ids: ids})
@@ -171,9 +171,9 @@ func (c *ChatController) fetchEmployees(ctx context.Context, employeeIDs []uuid.
 		return nil, fmt.Errorf("failed to fetch employees: %w", err)
 	}
 
-	employees := make([]dto.Employee, len(employeesResponse.Employees))
+	employees := make([]dto.Participant, len(employeesResponse.Employees))
 	for i, emp := range employeesResponse.Employees {
-		employees[i] = dto.Employee{
+		employees[i] = dto.Participant{
 			Id:         uuid.MustParse(emp.Id),
 			Name:       emp.Name,
 			Surname:    emp.Surname,

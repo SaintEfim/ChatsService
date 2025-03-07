@@ -1,36 +1,36 @@
 definitions:
   dto.Chat:
     properties:
-      employees:
-        items:
-          $ref: '#/definitions/dto.Employee'
-        type: array
       id:
         type: string
       name:
         type: string
+      participants:
+        items:
+          $ref: '#/definitions/dto.Participant'
+        type: array
     required:
-    - employees
     - id
+    - participants
     type: object
   dto.ChatCreate:
     properties:
-      employee_ids:
-        items:
-          type: string
-        type: array
       is_group:
         type: boolean
       name:
         type: string
+      participant_ids:
+        items:
+          type: string
+        type: array
     required:
-    - employee_ids
+    - participant_ids
     type: object
   dto.ChatDetail:
     properties:
       employees:
         items:
-          $ref: '#/definitions/dto.Employee'
+          $ref: '#/definitions/dto.Participant'
         type: array
       id:
         type: string
@@ -44,28 +44,14 @@ definitions:
     type: object
   dto.ChatUpdate:
     properties:
-      employee_ids:
+      name:
+        type: string
+      participant_ids:
         items:
           type: string
         type: array
-      name:
-        type: string
     required:
-    - employee_ids
-    type: object
-  dto.Employee:
-    properties:
-      id:
-        type: string
-      name:
-        type: string
-      patronymic:
-        type: string
-      surname:
-        type: string
-    required:
-    - name
-    - surname
+    - participant_ids
     type: object
   dto.Error:
     properties:
@@ -83,38 +69,38 @@ definitions:
     properties:
       chat_id:
         type: string
-      colleague_id:
-        type: string
       created_at:
         type: string
-      employee_id:
-        type: string
       id:
+        type: string
+      receiver_id:
+        type: string
+      sender_id:
         type: string
       text:
         type: string
     required:
     - chat_id
-    - colleague_id
     - created_at
-    - employee_id
     - id
+    - receiver_id
+    - sender_id
     - text
     type: object
   dto.MessageCreate:
     properties:
       chat_id:
         type: string
-      colleague_id:
+      receiver_id:
         type: string
-      employee_id:
+      sender_id:
         type: string
       text:
         type: string
     required:
     - chat_id
-    - colleague_id
-    - employee_id
+    - receiver_id
+    - sender_id
     - text
     type: object
   dto.MessageUpdate:
@@ -123,6 +109,20 @@ definitions:
         type: string
     required:
     - text
+    type: object
+  dto.Participant:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      patronymic:
+        type: string
+      surname:
+        type: string
+    required:
+    - name
+    - surname
     type: object
 info:
   contact: {}

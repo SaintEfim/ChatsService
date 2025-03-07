@@ -6,16 +6,18 @@ import (
 	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/entity"
 	"ChatsService/internal/models/interfaces"
+	"ChatsService/internal/validator"
 
 	"github.com/google/uuid"
 )
 
 type MessageController struct {
-	rep interfaces.Repository[entity.Message]
+	messageValidator *validator.MessageValidator
+	rep              interfaces.Repository[entity.Message]
 }
 
-func NewMessageController(rep interfaces.Repository[entity.Message]) interfaces.MessageController {
-	return &MessageController{rep: rep}
+func NewMessageController(messageValidator *validator.MessageValidator, rep interfaces.Repository[entity.Message]) interfaces.MessageController {
+	return &MessageController{messageValidator: messageValidator, rep: rep}
 }
 
 func (c *MessageController) Get(ctx context.Context) ([]*dto.Message, error) {
@@ -28,12 +30,12 @@ func (c *MessageController) Get(ctx context.Context) ([]*dto.Message, error) {
 
 	for _, messageEntity := range messagesEntities {
 		message := &dto.Message{
-			Id:          messageEntity.Id,
-			ChatId:      messageEntity.ChatId,
-			EmployeeId:  messageEntity.EmployeeId,
-			ColleagueId: messageEntity.ColleagueId,
-			Text:        messageEntity.Text,
-			CreatedAt:   messageEntity.CreatedAt,
+			Id:         messageEntity.Id,
+			ChatId:     messageEntity.ChatId,
+			SenderId:   messageEntity.SenderId,
+			ReceiverId: messageEntity.ReceiverId,
+			Text:       messageEntity.Text,
+			CreatedAt:  messageEntity.CreatedAt,
 		}
 
 		messages = append(messages, message)
@@ -53,12 +55,12 @@ func (c *MessageController) GetMessagesByChatId(ctx context.Context, chatId uuid
 	for _, messageEntity := range messagesEntities {
 		if messageEntity.ChatId == chatId {
 			message := &dto.Message{
-				Id:          messageEntity.Id,
-				ChatId:      messageEntity.ChatId,
-				EmployeeId:  messageEntity.EmployeeId,
-				ColleagueId: messageEntity.ColleagueId,
-				Text:        messageEntity.Text,
-				CreatedAt:   messageEntity.CreatedAt,
+				Id:         messageEntity.Id,
+				ChatId:     messageEntity.ChatId,
+				SenderId:   messageEntity.SenderId,
+				ReceiverId: messageEntity.ReceiverId,
+				Text:       messageEntity.Text,
+				CreatedAt:  messageEntity.CreatedAt,
 			}
 
 			messages = append(messages, message)
@@ -76,34 +78,38 @@ func (c *MessageController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.
 	}
 
 	message := &dto.Message{
-		Id:          messageEntity.Id,
-		ChatId:      messageEntity.ChatId,
-		EmployeeId:  messageEntity.EmployeeId,
-		ColleagueId: messageEntity.ColleagueId,
-		Text:        messageEntity.Text,
-		CreatedAt:   messageEntity.CreatedAt,
+		Id:         messageEntity.Id,
+		ChatId:     messageEntity.ChatId,
+		SenderId:   messageEntity.SenderId,
+		ReceiverId: messageEntity.ReceiverId,
+		Text:       messageEntity.Text,
+		CreatedAt:  messageEntity.CreatedAt,
 	}
 
 	return message, nil
 }
 
-func (c *MessageController) Create(ctx context.Context, chat *dto.MessageCreate) (*dto.Message, error) {
+func (c *MessageController) Create(ctx context.Context, message *dto.MessageCreate) (*dto.Message, error) {
+	if err := c.messageValidator.Validate(message); err != nil {
+		return nil, err
+	}
+
 	createRes, err := c.rep.Create(ctx, &entity.Message{
-		ChatId:      chat.ChatId,
-		EmployeeId:  chat.EmployeeId,
-		ColleagueId: chat.ColleagueId,
-		Text:        chat.Text,
+		ChatId:     message.ChatId,
+		SenderId:   message.SenderId,
+		ReceiverId: message.ReceiverId,
+		Text:       message.Text,
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	createItem := &dto.Message{
-		Id:          createRes.Id,
-		ChatId:      chat.ChatId,
-		EmployeeId:  chat.EmployeeId,
-		ColleagueId: chat.ColleagueId,
-		Text:        chat.Text,
+		Id:         createRes.Id,
+		ChatId:     message.ChatId,
+		SenderId:   message.SenderId,
+		ReceiverId: message.ReceiverId,
+		Text:       message.Text,
 	}
 
 	return createItem, nil
@@ -118,9 +124,9 @@ func (c *MessageController) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (c *MessageController) Update(ctx context.Context, id uuid.UUID, chat *dto.MessageUpdate) error {
+func (c *MessageController) Update(ctx context.Context, id uuid.UUID, message *dto.MessageUpdate) error {
 	err := c.rep.Update(ctx, id, &entity.Message{
-		Text: chat.Text,
+		Text: message.Text,
 	})
 	if err != nil {
 		return err

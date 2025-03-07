@@ -557,41 +557,41 @@ const docTemplate = `{
         "dto.Chat": {
             "type": "object",
             "required": [
-                "employees",
-                "id"
+                "id",
+                "participants"
             ],
             "properties": {
-                "employees": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.Employee"
-                    }
-                },
                 "id": {
                     "type": "string"
                 },
                 "name": {
                     "type": "string"
+                },
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.Participant"
+                    }
                 }
             }
         },
         "dto.ChatCreate": {
             "type": "object",
             "required": [
-                "employee_ids"
+                "participant_ids"
             ],
             "properties": {
-                "employee_ids": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
                 "is_group": {
                     "type": "boolean"
                 },
                 "name": {
                     "type": "string"
+                },
+                "participant_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
@@ -605,7 +605,7 @@ const docTemplate = `{
                 "employees": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dto.Employee"
+                        "$ref": "#/definitions/dto.Participant"
                     }
                 },
                 "id": {
@@ -622,38 +622,17 @@ const docTemplate = `{
         "dto.ChatUpdate": {
             "type": "object",
             "required": [
-                "employee_ids"
+                "participant_ids"
             ],
             "properties": {
-                "employee_ids": {
+                "name": {
+                    "type": "string"
+                },
+                "participant_ids": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.Employee": {
-            "type": "object",
-            "required": [
-                "name",
-                "surname"
-            ],
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "patronymic": {
-                    "type": "string"
-                },
-                "surname": {
-                    "type": "string"
                 }
             }
         },
@@ -679,26 +658,26 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "chat_id",
-                "colleague_id",
                 "created_at",
-                "employee_id",
                 "id",
+                "receiver_id",
+                "sender_id",
                 "text"
             ],
             "properties": {
                 "chat_id": {
                     "type": "string"
                 },
-                "colleague_id": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
                 },
-                "employee_id": {
+                "id": {
                     "type": "string"
                 },
-                "id": {
+                "receiver_id": {
+                    "type": "string"
+                },
+                "sender_id": {
                     "type": "string"
                 },
                 "text": {
@@ -710,18 +689,18 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "chat_id",
-                "colleague_id",
-                "employee_id",
+                "receiver_id",
+                "sender_id",
                 "text"
             ],
             "properties": {
                 "chat_id": {
                     "type": "string"
                 },
-                "colleague_id": {
+                "receiver_id": {
                     "type": "string"
                 },
-                "employee_id": {
+                "sender_id": {
                     "type": "string"
                 },
                 "text": {
@@ -736,6 +715,27 @@ const docTemplate = `{
             ],
             "properties": {
                 "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.Participant": {
+            "type": "object",
+            "required": [
+                "name",
+                "surname"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "patronymic": {
+                    "type": "string"
+                },
+                "surname": {
                     "type": "string"
                 }
             }

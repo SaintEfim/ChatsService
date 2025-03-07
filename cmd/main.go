@@ -70,6 +70,7 @@ func main() {
 			postgres.ConnectToDB,
 			grpc.NewEmployeeGrpcClient,
 			validator.NewChatValidator,
+			validator.NewMessageValidator,
 			repository.NewChatRepository,
 			repository.NewMessageRepository,
 			controller.NewChatController,

@@ -7,9 +7,9 @@ import (
 
 type Message struct {
 	gorm.Model
-	Id          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primary_key"`
-	ChatId      uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();foreignkey:ChatId"`
-	EmployeeId  uuid.UUID `gorm:"type:uuid"`
-	ColleagueId uuid.UUID `gorm:"type:uuid"`
-	Text        string
+	Id         uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primary_key"`
+	ChatId     uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();foreignkey:ChatId"`
+	SenderId   uuid.UUID `gorm:"type:uuid"`
+	ReceiverId uuid.UUID `gorm:"type:uuid"`
+	Text       string
 }
