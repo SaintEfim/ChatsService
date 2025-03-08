@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "proto/chat;";
+
+package chats;
+
+service GreeterChats {
+  rpc CreateMessage (MessageCreateRequest) returns (MessageCreateResponse);
+}
+
+message MessageCreateRequest {
+  string senderId = 1;
+  string receiverId = 2;
+  string text = 3;
+}
+
+message MessageCreateResponse {
+  string id = 1;
+}
