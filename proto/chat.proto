@@ -12,6 +12,7 @@ message MessageCreateRequest {
   string senderId = 1;
   string receiverId = 2;
   string text = 3;
+  string createdAt = 4;
 }
 
 message MessageCreateResponse {

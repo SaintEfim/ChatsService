@@ -81,8 +81,8 @@ func (c *ChatController) GetChatsByUserId(ctx context.Context, userId uuid.UUID)
 	return chats, nil
 }
 
-func (c *ChatController) PrivateChatExists(ctx context.Context, userId uuid.UUID, colleagueId uuid.UUID) (bool, error) {
-	if userId == colleagueId {
+func (c *ChatController) PrivateChatExists(ctx context.Context, userId uuid.UUID, interlocutorId uuid.UUID) (bool, error) {
+	if userId == interlocutorId {
 		return false, nil
 	}
 
@@ -92,7 +92,7 @@ func (c *ChatController) PrivateChatExists(ctx context.Context, userId uuid.UUID
 	}
 
 	for _, chatEntity := range chatEntities {
-		if chatEntity.ParticipantIds.Contains(userId) && chatEntity.ParticipantIds.Contains(colleagueId) {
+		if chatEntity.ParticipantIds.Contains(userId) && chatEntity.ParticipantIds.Contains(interlocutorId) {
 			return true, nil
 		}
 	}

@@ -21,7 +21,7 @@ func NewChatHandler(controller interfaces.ChatController) interfaces.Handler[dto
 func (h *ChatHandler) ConfigureRoutes(r *gin.Engine) {
 	r.GET("/api/v1/chats", h.Get)
 	r.GET("/api/v1/chats/user/:id", h.GetChatsByUserId)
-	r.GET("/api/v1/chats/user/:id/colleague/:colleague_id", h.PrivateChatExists)
+	r.GET("/api/v1/chats/user/:id/interlocutor/:interlocutorId", h.PrivateChatExists)
 	r.GET("/api/v1/chats/:id", h.GetOneById)
 	r.POST("/api/v1/chats", h.Create)
 	r.DELETE("/api/v1/chats/:id", h.Delete)
@@ -105,7 +105,7 @@ func (h *ChatHandler) PrivateChatExists(c *gin.Context) {
 		return
 	}
 
-	colleagueId, err := uuid.Parse(c.Param("colleague_id"))
+	interlocutorId, err := uuid.Parse(c.Param("interlocutorId"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.Error{
 			Status:      http.StatusBadRequest,
@@ -114,7 +114,7 @@ func (h *ChatHandler) PrivateChatExists(c *gin.Context) {
 		return
 	}
 
-	exists, err := h.controller.PrivateChatExists(ctx, userId, colleagueId)
+	exists, err := h.controller.PrivateChatExists(ctx, userId, interlocutorId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Error{
 			Status:      http.StatusInternalServerError,
