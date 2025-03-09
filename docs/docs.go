@@ -745,11 +745,11 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
-	Schemes:          []string{},
-	Title:            "",
+	Version:          "1.0",
+	Host:             "localhost:1006",
+	BasePath:         "/",
+	Schemes:          []string{"http", "https"},
+	Title:            "ChatsService API",
 	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

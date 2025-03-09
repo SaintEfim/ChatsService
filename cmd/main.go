@@ -1,7 +1,11 @@
+// @title ChatsService API
+// @version 1.0
+// @host localhost:1006
+// @BasePath /
+// @schemes http https
 package main
 
 import (
-	clientValidator "ChatsService/pkg/validator"
 	"context"
 
 	"ChatsService/config"
@@ -14,6 +18,8 @@ import (
 	"ChatsService/internal/server"
 	"ChatsService/internal/validator"
 	"ChatsService/pkg/logger"
+	clientValidator "ChatsService/pkg/validator"
+
 	"go.uber.org/fx"
 	"gorm.io/gorm"
 )
