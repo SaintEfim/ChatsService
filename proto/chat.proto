@@ -9,10 +9,11 @@ service GreeterChats {
 }
 
 message MessageCreateRequest {
-  string senderId = 1;
-  string receiverId = 2;
-  string text = 3;
-  string createdAt = 4;
+  string chatId = 1;
+  string senderId = 2;
+  string receiverId = 3;
+  string text = 4;
+  string createdAt = 5;
 }
 
 message MessageCreateResponse {

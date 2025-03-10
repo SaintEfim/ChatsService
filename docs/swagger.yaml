@@ -88,22 +88,6 @@ definitions:
     - sender_id
     - text
     type: object
-  dto.MessageCreate:
-    properties:
-      chat_id:
-        type: string
-      receiver_id:
-        type: string
-      sender_id:
-        type: string
-      text:
-        type: string
-    required:
-    - chat_id
-    - receiver_id
-    - sender_id
-    - text
-    type: object
   dto.MessageUpdate:
     properties:
       text:
@@ -335,33 +319,6 @@ paths:
             items:
               $ref: '#/definitions/dto.Message'
             type: array
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/dto.Error'
-      tags:
-      - Messages
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: Message info
-        in: body
-        name: message
-        required: true
-        schema:
-          $ref: '#/definitions/dto.MessageCreate'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            type: string
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dto.Error'
         "500":
           description: Internal Server Error
           schema:

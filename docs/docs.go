@@ -338,48 +338,6 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Messages"
-                ],
-                "parameters": [
-                    {
-                        "description": "Message info",
-                        "name": "message",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.MessageCreate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Error"
-                        }
-                    }
-                }
             }
         },
         "/api/v1/messages/chat/{id}": {
@@ -672,29 +630,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
-                },
-                "receiver_id": {
-                    "type": "string"
-                },
-                "sender_id": {
-                    "type": "string"
-                },
-                "text": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.MessageCreate": {
-            "type": "object",
-            "required": [
-                "chat_id",
-                "receiver_id",
-                "sender_id",
-                "text"
-            ],
-            "properties": {
-                "chat_id": {
                     "type": "string"
                 },
                 "receiver_id": {
