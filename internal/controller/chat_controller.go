@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-	"fmt"
 
 	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/entity"
@@ -168,7 +167,7 @@ func (c *ChatController) fetchEmployees(ctx context.Context, employeeIDs []uuid.
 
 	employeesResponse, err := c.employeeClient.Search(ctx, &employee.SearchRequest{Ids: ids})
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch employees: %w", err)
+		return nil, err
 	}
 
 	employees := make([]dto.Participant, len(employeesResponse.Employees))

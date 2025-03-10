@@ -2,9 +2,9 @@ package server
 
 import (
 	"context"
+	"errors"
 	"net"
 	"net/http"
-	"sync"
 	"time"
 
 	"ChatsService/config"
@@ -47,9 +47,7 @@ func NewServer(httpSrv *http.Server, grpcSrv *grpc.Server, cfg *config.Config,
 	messageHandler interfaces.Handler[dto.Message],
 	logger *zap.Logger) interfaces.Server {
 	return &Server{
-		httpSrv: &http.Server{
-			Addr: net.JoinHostPort(cfg.HTTPServer.Addr, cfg.HTTPServer.Port),
-		},
+		httpSrv:        httpSrv,
 		grpcSrv:        grpcSrv,
 		cfg:            cfg,
 		chatHandler:    chatHandler,
@@ -59,12 +57,7 @@ func NewServer(httpSrv *http.Server, grpcSrv *grpc.Server, cfg *config.Config,
 }
 
 func (s *Server) Run(ctx context.Context) error {
-	var wg sync.WaitGroup
-	errChan := make(chan error, 2)
-
-	wg.Add(1)
 	go func() {
-		defer wg.Done()
 		g := gin.Default()
 		g.Use(middleware.LoggingMiddleware(s.logger))
 		s.setGinMode(ctx)
@@ -73,41 +66,24 @@ func (s *Server) Run(ctx context.Context) error {
 
 		s.httpSrv.Handler = g
 
-		s.logger.Sugar().Infof("HTTP Server run on %s", s.httpSrv.Addr)
-		if err := s.httpSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			errChan <- err
+		s.logger.Sugar().Infof("HTTP Server run on %s", s.cfg.HTTPServer.Port)
+		if err := s.httpSrv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			s.logger.Error("HTTP server error", zap.Error(err))
 		}
 	}()
 
-	wg.Add(1)
 	go func() {
-		defer wg.Done()
-
 		lis, err := net.Listen(s.cfg.GRPCServer.Type, s.cfg.GRPCServer.Addr)
 		if err != nil {
-			errChan <- err
-			return
+			s.logger.Error("gRPC net.Listen error", zap.Error(err))
 		}
-		s.logger.Sugar().Infof("gRPC server run %s", s.cfg.GRPCServer.Addr)
+
+		s.logger.Sugar().Infof("gRPC server run on %s", s.cfg.GRPCServer.Addr)
 		if err := s.grpcSrv.Serve(lis); err != nil {
-			errChan <- err
+			s.logger.Error("gRPC server error", zap.Error(err))
 		}
 	}()
 
-	select {
-	case err := <-errChan:
-		return err
-	case <-ctx.Done():
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-
-		if err := s.httpSrv.Shutdown(shutdownCtx); err != nil {
-			s.logger.Error("Ошибка при завершении HTTP сервера", zap.Error(err))
-		}
-		s.grpcSrv.GracefulStop()
-	}
-
-	wg.Wait()
 	return nil
 }
 
