@@ -8,6 +8,9 @@ DataBase:
 GRPCClient:
   Services:
     employees: "0.0.0.0:2003"
+GRPCServer:
+  Type: "tcp"
+  Addr: ":2006"
 Logs:
   Path: ""
   Level: info
