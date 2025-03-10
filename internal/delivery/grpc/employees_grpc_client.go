@@ -17,7 +17,7 @@ type EmployeeGrpcClient struct {
 	conn   *grpc.ClientConn
 }
 
-func NewEmployeeGrpcClient(ctx context.Context, cfg *config.Config) interfaces.EmployeeGrpc {
+func NewEmployeeGrpcClient(ctx context.Context, cfg *config.Config) interfaces.EmployeeGrpcClient {
 	return &EmployeeGrpcClient{
 		cfg: cfg,
 	}

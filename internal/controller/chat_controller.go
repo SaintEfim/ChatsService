@@ -15,12 +15,12 @@ import (
 type ChatController struct {
 	chatValidator  *validator.ChatValidator
 	rep            interfaces.Repository[entity.Chat]
-	employeeClient interfaces.EmployeeGrpc
+	employeeClient interfaces.EmployeeGrpcClient
 }
 
 func NewChatController(chatValidator *validator.ChatValidator,
 	rep interfaces.Repository[entity.Chat],
-	employeeClient interfaces.EmployeeGrpc) interfaces.ChatController {
+	employeeClient interfaces.EmployeeGrpcClient) interfaces.ChatController {
 	return &ChatController{chatValidator: chatValidator, rep: rep, employeeClient: employeeClient}
 }
 

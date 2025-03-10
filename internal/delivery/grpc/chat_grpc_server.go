@@ -15,7 +15,7 @@ type ChatGRPCServer struct {
 	chat.UnimplementedGreeterChatsServer
 }
 
-func NewChatGrpcServer(controller interfaces.MessageController) interfaces.ChatGRPC {
+func NewChatGrpcServer(controller interfaces.MessageController) interfaces.ChatGRPCServer {
 	return &ChatGRPCServer{controller: controller}
 }
 
@@ -33,7 +33,6 @@ func (c *ChatGRPCServer) CreateMessage(ctx context.Context, req *chat.MessageCre
 	}
 
 	response.Id = message.Id.String()
-	response.CreatedAt = message.CreatedAt.String()
 
 	return response, nil
 }

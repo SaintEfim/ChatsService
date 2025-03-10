@@ -12,10 +12,10 @@ import (
 )
 
 type EmployeeValidator struct {
-	client interfaces.EmployeeGrpc
+	client interfaces.EmployeeGrpcClient
 }
 
-func NewEmployeeValidator(client interfaces.EmployeeGrpc) *EmployeeValidator {
+func NewEmployeeValidator(client interfaces.EmployeeGrpcClient) *EmployeeValidator {
 	return &EmployeeValidator{
 		client: client,
 	}

@@ -17,5 +17,4 @@ message MessageCreateRequest {
 
 message MessageCreateResponse {
   string id = 1;
-  string createdAt = 2;
 }

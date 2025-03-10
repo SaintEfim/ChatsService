@@ -1,11 +1,12 @@
 package interfaces
 
 import (
-	"ChatsService/proto/chat"
 	"context"
+
+	"ChatsService/proto/chat"
 )
 
-type ChatGRPC interface {
+type ChatGRPCServer interface {
 	CreateMessage(ctx context.Context, req *chat.MessageCreateRequest) (*chat.MessageCreateResponse, error)
 	chat.GreeterChatsServer
 }

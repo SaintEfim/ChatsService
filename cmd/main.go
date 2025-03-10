@@ -56,7 +56,7 @@ func registerServer(ctx context.Context, lifecycle fx.Lifecycle, srv interfaces.
 	})
 }
 
-func registerGRPCClient(lc fx.Lifecycle, client interfaces.EmployeeGrpc) {
+func registerGRPCClient(lc fx.Lifecycle, client interfaces.EmployeeGrpcClient) {
 	lc.Append(fx.Hook{
 		OnStart: client.Initialize,
 		OnStop:  client.Close,

@@ -36,7 +36,7 @@ func NewHTTPServer(cfg *config.Config) *http.Server {
 	}
 }
 
-func NewGRPCServer(chatGrpc interfaces.ChatGRPC) *grpc.Server {
+func NewGRPCServer(chatGrpc interfaces.ChatGRPCServer) *grpc.Server {
 	grpcServer := grpc.NewServer()
 	chat.RegisterGreeterChatsServer(grpcServer, chatGrpc)
 	return grpcServer
