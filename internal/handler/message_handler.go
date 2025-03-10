@@ -3,11 +3,11 @@ package handler
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-
 	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/interfaces"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type MessageHandler struct {

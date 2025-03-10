@@ -3,9 +3,9 @@ package interfaces
 import (
 	"context"
 
-	"github.com/google/uuid"
-
 	"ChatsService/internal/models/dto"
+
+	"github.com/google/uuid"
 )
 
 type MessageController interface {

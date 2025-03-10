@@ -17,10 +17,10 @@ type EmployeeGrpcClient struct {
 	conn   *grpc.ClientConn
 }
 
-func NewEmployeeGrpcClient(ctx context.Context, cfg *config.Config) (interfaces.EmployeeGrpc, error) {
+func NewEmployeeGrpcClient(ctx context.Context, cfg *config.Config) interfaces.EmployeeGrpc {
 	return &EmployeeGrpcClient{
 		cfg: cfg,
-	}, nil
+	}
 }
 
 func (k *EmployeeGrpcClient) Initialize(ctx context.Context) error {
