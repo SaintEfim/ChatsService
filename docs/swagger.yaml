@@ -16,8 +16,6 @@ definitions:
     type: object
   dto.ChatCreate:
     properties:
-      is_group:
-        type: boolean
       name:
         type: string
       participant_ids:
@@ -35,8 +33,6 @@ definitions:
         type: array
       id:
         type: string
-      is_group:
-        type: boolean
       name:
         type: string
     required:

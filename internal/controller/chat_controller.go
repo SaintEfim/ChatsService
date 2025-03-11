@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-	"fmt"
 
 	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/entity"
@@ -16,12 +15,12 @@ import (
 type ChatController struct {
 	chatValidator  *validator.ChatValidator
 	rep            interfaces.Repository[entity.Chat]
-	employeeClient interfaces.EmployeeGrpc
+	employeeClient interfaces.EmployeeGrpcClient
 }
 
 func NewChatController(chatValidator *validator.ChatValidator,
 	rep interfaces.Repository[entity.Chat],
-	employeeClient interfaces.EmployeeGrpc) interfaces.ChatController {
+	employeeClient interfaces.EmployeeGrpcClient) interfaces.ChatController {
 	return &ChatController{chatValidator: chatValidator, rep: rep, employeeClient: employeeClient}
 }
 
@@ -114,7 +113,6 @@ func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Cha
 	chat := &dto.ChatDetail{
 		Id:           chatEntity.Id,
 		Name:         chatEntity.Name,
-		IsGroup:      chatEntity.IsGroup,
 		Participants: participants,
 	}
 
@@ -128,7 +126,6 @@ func (c *ChatController) Create(ctx context.Context, chat *dto.ChatCreate) (*dto
 
 	createRes, err := c.rep.Create(ctx, &entity.Chat{
 		Name:           chat.Name,
-		IsGroup:        chat.IsGroup,
 		ParticipantIds: chat.ParticipantIds,
 	})
 	if err != nil {
@@ -168,7 +165,7 @@ func (c *ChatController) fetchEmployees(ctx context.Context, employeeIDs []uuid.
 
 	employeesResponse, err := c.employeeClient.Search(ctx, &employee.SearchRequest{Ids: ids})
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch employees: %w", err)
+		return nil, err
 	}
 
 	employees := make([]dto.Participant, len(employeesResponse.Employees))

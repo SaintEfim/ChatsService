@@ -539,9 +539,6 @@ const docTemplate = `{
                 "participant_ids"
             ],
             "properties": {
-                "is_group": {
-                    "type": "boolean"
-                },
                 "name": {
                     "type": "string"
                 },
@@ -568,9 +565,6 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "string"
-                },
-                "is_group": {
-                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"

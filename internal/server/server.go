@@ -2,24 +2,28 @@ package server
 
 import (
 	"context"
+	"errors"
 	"net"
 	"net/http"
 	"time"
-
-	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-	"go.uber.org/zap"
 
 	"ChatsService/config"
 	"ChatsService/docs"
 	"ChatsService/internal/middleware"
 	"ChatsService/internal/models/dto"
 	"ChatsService/internal/models/interfaces"
+	"ChatsService/proto/chat"
+
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
 
 type Server struct {
-	srv            *http.Server
+	httpSrv        *http.Server
+	grpcSrv        *grpc.Server
 	cfg            *config.Config
 	chatHandler    interfaces.Handler[dto.Chat]
 	messageHandler interfaces.Handler[dto.Message]
@@ -32,12 +36,19 @@ func NewHTTPServer(cfg *config.Config) *http.Server {
 	}
 }
 
-func NewServer(srv *http.Server, cfg *config.Config,
+func NewGRPCServer(chatGrpc interfaces.ChatGRPCServer) *grpc.Server {
+	grpcServer := grpc.NewServer()
+	chat.RegisterGreeterChatsServer(grpcServer, chatGrpc)
+	return grpcServer
+}
+
+func NewServer(httpSrv *http.Server, grpcSrv *grpc.Server, cfg *config.Config,
 	chatHandler interfaces.Handler[dto.Chat],
 	messageHandler interfaces.Handler[dto.Message],
 	logger *zap.Logger) interfaces.Server {
 	return &Server{
-		srv:            srv,
+		httpSrv:        httpSrv,
+		grpcSrv:        grpcSrv,
 		cfg:            cfg,
 		chatHandler:    chatHandler,
 		messageHandler: messageHandler,
@@ -46,45 +57,44 @@ func NewServer(srv *http.Server, cfg *config.Config,
 }
 
 func (s *Server) Run(ctx context.Context) error {
-	var err error
-
 	go func() {
 		g := gin.Default()
-
 		g.Use(middleware.LoggingMiddleware(s.logger))
-
 		s.setGinMode(ctx)
 		s.configureSwagger(ctx, g)
 		s.configurationHandler(ctx, g)
 
-		handler := CorsSettings(s.cfg).Handler(g)
+		s.httpSrv.Handler = g
 
-		s.srv.Handler = handler
-
-		s.logger.Sugar().Infof("Listening and serving HTTP on %s\n", s.srv.Addr)
-
-		if err := s.srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			s.logger.Error(err.Error())
+		s.logger.Sugar().Infof("HTTP Server run on %s", s.cfg.HTTPServer.Port)
+		if err := s.httpSrv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			s.logger.Error("HTTP server error", zap.Error(err))
 		}
 	}()
 
-	if err != nil {
-		return err
-	}
+	go func() {
+		lis, err := net.Listen(s.cfg.GRPCServer.Type, s.cfg.GRPCServer.Addr)
+		if err != nil {
+			s.logger.Error("gRPC net.Listen error", zap.Error(err))
+		}
+
+		s.logger.Sugar().Infof("gRPC server run on %s", s.cfg.GRPCServer.Addr)
+		if err := s.grpcSrv.Serve(lis); err != nil {
+			s.logger.Error("gRPC server error", zap.Error(err))
+		}
+	}()
 
 	return nil
 }
 
 func (s *Server) Stop(ctx context.Context) error {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	s.srv.RegisterOnShutdown(cancel)
-
-	if err := s.srv.Shutdown(ctx); err != nil {
+	if err := s.httpSrv.Shutdown(shutdownCtx); err != nil {
 		return err
 	}
-
+	s.grpcSrv.GracefulStop()
 	return nil
 }
 

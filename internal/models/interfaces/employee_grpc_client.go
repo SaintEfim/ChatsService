@@ -6,7 +6,7 @@ import (
 	"ChatsService/proto/employee"
 )
 
-type EmployeeGrpc interface {
+type EmployeeGrpcClient interface {
 	Initialize(ctx context.Context) error
 	Close(ctx context.Context) error
 	employee.GreeterEmployeesClient

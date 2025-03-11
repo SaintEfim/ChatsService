@@ -7,6 +7,7 @@ type Config struct {
 	HTTPServer           HTTPServer           `yaml:"HTTPServer"`
 	DataBase             DataBase             `yaml:"DataBase"`
 	GRPCClient           GRPCClient           `yaml:"GRPCClient"`
+	GRPCServer           GRPCServer           `yaml:"GRPCServer"`
 	Logs                 Logs                 `yaml:"Logs"`
 	Cors                 Cors                 `yaml:"Cors"`
 }
@@ -26,6 +27,11 @@ type DataBase struct {
 
 type GRPCClient struct {
 	Services map[string]string `yaml:"Services"`
+}
+
+type GRPCServer struct {
+	Type string
+	Addr string
 }
 
 type Logs struct {

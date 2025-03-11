@@ -56,7 +56,7 @@ func registerServer(ctx context.Context, lifecycle fx.Lifecycle, srv interfaces.
 	})
 }
 
-func registerGRPCClient(lc fx.Lifecycle, client interfaces.EmployeeGrpc) {
+func registerGRPCClient(lc fx.Lifecycle, client interfaces.EmployeeGrpcClient) {
 	lc.Append(fx.Hook{
 		OnStart: client.Initialize,
 		OnStop:  client.Close,
@@ -75,6 +75,7 @@ func main() {
 			logger.NewLogger,
 			postgres.ConnectToDB,
 			grpc.NewEmployeeGrpcClient,
+			grpc.NewChatGrpcServer,
 			validator.NewChatValidator,
 			validator.NewMessageValidator,
 			repository.NewChatRepository,
@@ -84,6 +85,7 @@ func main() {
 			handler.NewChatHandler,
 			handler.NewMessageHandler,
 			server.NewHTTPServer,
+			server.NewGRPCServer,
 			server.NewServer,
 			clientValidator.NewEmployeeValidator,
 		),

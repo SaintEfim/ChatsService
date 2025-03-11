@@ -13,7 +13,6 @@ message MessageCreateRequest {
   string senderId = 2;
   string receiverId = 3;
   string text = 4;
-  string createdAt = 5;
 }
 
 message MessageCreateResponse {
