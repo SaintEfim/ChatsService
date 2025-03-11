@@ -59,9 +59,6 @@ func (v *ChatValidator) validateChatStruct(sl validator.StructLevel) {
 }
 
 func (v *ChatValidator) validatePrivateChat(sl validator.StructLevel, chat dto.ChatCreate) {
-	if chat.IsGroup {
-		return
-	}
 	if chat.Name != "" {
 		sl.ReportError(chat.Name, "Name", "", "name must be empty for private chats", "")
 	}
@@ -84,9 +81,6 @@ func (v *ChatValidator) validatePrivateChat(sl validator.StructLevel, chat dto.C
 }
 
 func (v *ChatValidator) validateGroupChat(sl validator.StructLevel, chat dto.ChatCreate) {
-	if !chat.IsGroup {
-		return
-	}
 	if len(chat.ParticipantIds) < 1 {
 		sl.ReportError(chat.ParticipantIds, "ParticipantIds", "", "group chat must have at least 1 participant", "")
 	}

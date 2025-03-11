@@ -113,7 +113,6 @@ func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Cha
 	chat := &dto.ChatDetail{
 		Id:           chatEntity.Id,
 		Name:         chatEntity.Name,
-		IsGroup:      chatEntity.IsGroup,
 		Participants: participants,
 	}
 
@@ -127,7 +126,6 @@ func (c *ChatController) Create(ctx context.Context, chat *dto.ChatCreate) (*dto
 
 	createRes, err := c.rep.Create(ctx, &entity.Chat{
 		Name:           chat.Name,
-		IsGroup:        chat.IsGroup,
 		ParticipantIds: chat.ParticipantIds,
 	})
 	if err != nil {

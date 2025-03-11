@@ -57,7 +57,6 @@ type Chat struct {
 	gorm.Model
 	Id             uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primary_key"`
 	Name           string
-	IsGroup        bool      `gorm:"default:false"`
 	ParticipantIds UUIDArray `gorm:"type:uuid[]"`
 	Messages       []Message
 }
