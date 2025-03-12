@@ -22,7 +22,9 @@ type HTTPServer struct {
 }
 
 type DataBase struct {
-	ConnectionString string `yaml:"ConnectionString"`
+	ConnectionString   string `yaml:"ConnectionString"`
+	ConnectionPostgres string `yaml:"ConnectionPostgres"`
+	Name               string `yaml:"Name"`
 }
 
 type GRPCClient struct {
