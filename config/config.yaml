@@ -1,6 +1,7 @@
 HTTPServer:
   Addr: "0.0.0.0"
   Port: "1006"
+  Timeout: 5
 EnvironmentVariables:
   Environment: "development"
 DataBase:

@@ -1,6 +1,9 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+	"time"
+)
 
 type Config struct {
 	EnvironmentVariables EnvironmentVariables `yaml:"EnvironmentVariables"`
@@ -17,8 +20,9 @@ type EnvironmentVariables struct {
 }
 
 type HTTPServer struct {
-	Addr string `yaml:"Addr"`
-	Port string `yaml:"Port"`
+	Addr    string        `yaml:"Addr"`
+	Port    string        `yaml:"Port"`
+	Timeout time.Duration `yaml:"Timeout"`
 }
 
 type DataBase struct {

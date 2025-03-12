@@ -1,11 +1,10 @@
-package server
+package http
 
 import (
 	"context"
 	"errors"
 	"net"
 	"net/http"
-	"time"
 
 	"ChatsService/config"
 	"ChatsService/docs"
@@ -88,7 +87,7 @@ func (s *Server) Run(ctx context.Context) error {
 }
 
 func (s *Server) Stop(ctx context.Context) error {
-	shutdownCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(ctx, s.cfg.HTTPServer.Timeout)
 	defer cancel()
 
 	if err := s.httpSrv.Shutdown(shutdownCtx); err != nil {
