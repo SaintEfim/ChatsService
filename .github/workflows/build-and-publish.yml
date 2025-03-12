@@ -20,7 +20,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./ChatsService/Dockerfile
+          file: ./Dockerfile
           push: false
           tags: test/app:latest
           cache-from: type=gha
@@ -48,7 +48,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./ChatsService/Dockerfile
+          file: ./Dockerfile
           push: true
           tags: saintefim/chats-service:latest
           cache-from: type=gha
