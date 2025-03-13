@@ -1,7 +1,6 @@
 package main
 
 import (
-	"ChatsService/internal/server/http"
 	"context"
 
 	"ChatsService/config"
@@ -11,6 +10,7 @@ import (
 	"ChatsService/internal/models/interfaces"
 	"ChatsService/internal/postgres"
 	"ChatsService/internal/repository"
+	"ChatsService/internal/server/http"
 	"ChatsService/internal/validator"
 	"ChatsService/pkg/logger"
 	clientValidator "ChatsService/pkg/validator"
@@ -63,6 +63,9 @@ func registerGRPCClient(lc fx.Lifecycle, client interfaces.EmployeeGrpcClient) {
 // @host localhost:1006
 // @BasePath /
 // @schemes http https
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	fx.New(
 		fx.Provide(func() context.Context {
