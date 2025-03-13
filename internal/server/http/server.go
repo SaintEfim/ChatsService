@@ -59,7 +59,7 @@ func (s *Server) Run(ctx context.Context) error {
 	go func() {
 		g := gin.Default()
 		g.Use(middleware.LoggingMiddleware(s.logger))
-		g.Use(middleware.AuthMiddleware(s.logger, s.cfg))
+		g.Use(middleware.AuthMiddleware(s.logger, s.cfg.AuthenticationConfiguration.AccessSecretKey))
 		s.setGinMode(ctx)
 		s.configureSwagger(ctx, g)
 		s.configurationHandler(ctx, g)
