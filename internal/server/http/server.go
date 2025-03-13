@@ -13,6 +13,7 @@ import (
 	"ChatsService/internal/models/interfaces"
 	"ChatsService/proto/chat"
 
+	middlewarePkg "ChatsService/pkg/middleware"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -59,7 +60,7 @@ func (s *Server) Run(ctx context.Context) error {
 	go func() {
 		g := gin.Default()
 		g.Use(middleware.LoggingMiddleware(s.logger))
-		g.Use(middleware.AuthMiddleware(s.logger, s.cfg.AuthenticationConfiguration.AccessSecretKey))
+		g.Use(middlewarePkg.AuthMiddleware(s.logger, s.cfg.AuthenticationConfiguration.AccessSecretKey))
 		s.setGinMode(ctx)
 		s.configureSwagger(ctx, g)
 		s.configurationHandler(ctx, g)
