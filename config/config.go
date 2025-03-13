@@ -1,18 +1,20 @@
 package config
 
 import (
-	"github.com/spf13/viper"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 type Config struct {
-	EnvironmentVariables EnvironmentVariables `yaml:"EnvironmentVariables"`
-	HTTPServer           HTTPServer           `yaml:"HTTPServer"`
-	DataBase             DataBase             `yaml:"DataBase"`
-	GRPCClient           GRPCClient           `yaml:"GRPCClient"`
-	GRPCServer           GRPCServer           `yaml:"GRPCServer"`
-	Logs                 Logs                 `yaml:"Logs"`
-	Cors                 Cors                 `yaml:"Cors"`
+	EnvironmentVariables        EnvironmentVariables        `yaml:"EnvironmentVariables"`
+	HTTPServer                  HTTPServer                  `yaml:"HTTPServer"`
+	DataBase                    DataBase                    `yaml:"DataBase"`
+	GRPCClient                  GRPCClient                  `yaml:"GRPCClient"`
+	GRPCServer                  GRPCServer                  `yaml:"GRPCServer"`
+	Logs                        Logs                        `yaml:"Logs"`
+	Cors                        Cors                        `yaml:"Cors"`
+	AuthenticationConfiguration AuthenticationConfiguration `yaml:"AuthenticationConfiguration"`
 }
 
 type EnvironmentVariables struct {
@@ -49,6 +51,10 @@ type Logs struct {
 
 type Cors struct {
 	AllowedOrigins []string `yaml:"AllowedOrigins"`
+}
+
+type AuthenticationConfiguration struct {
+	AccessSecretKey string `yaml:"AccessSecretKey"`
 }
 
 func ReadConfig(cfgName, cfgType, cfgPath string) (*Config, error) {

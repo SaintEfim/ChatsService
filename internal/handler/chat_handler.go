@@ -34,6 +34,7 @@ func (h *ChatHandler) ConfigureRoutes(r *gin.Engine) {
 // @Produce json
 // @Success 200 {object} []dto.Chat
 // @Failure 500 {object} dto.Error
+// @Security BearerAuth
 // @Router /api/v1/chats [get]
 func (h *ChatHandler) Get(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -57,6 +58,7 @@ func (h *ChatHandler) Get(c *gin.Context) {
 // @Param id path string true "User ID"
 // @Success 200 {object} []dto.Chat
 // @Failure 500 {object} dto.Error
+// @Security BearerAuth
 // @Router /api/v1/chats/user/{id} [get]
 func (h *ChatHandler) GetChatsByUserId(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -92,6 +94,7 @@ func (h *ChatHandler) GetChatsByUserId(c *gin.Context) {
 // @Success 200 {object} map[string]bool
 // @Failure 400 {object} dto.Error
 // @Failure 500 {object} dto.Error
+// @Security BearerAuth
 // @Router /api/v1/chats/user/{user_id}/colleague/{colleague_id} [get]
 func (h *ChatHandler) PrivateChatExists(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -134,6 +137,7 @@ func (h *ChatHandler) PrivateChatExists(c *gin.Context) {
 // @Success 200 {object} dto.ChatDetail
 // @Failure 400 {object} dto.Error
 // @Failure 404 {object} dto.Error
+// @Security BearerAuth
 // @Router /api/v1/chats/{id} [get]
 func (h *ChatHandler) GetOneById(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -167,6 +171,7 @@ func (h *ChatHandler) GetOneById(c *gin.Context) {
 // @Success 201 {object} uuid.UUID
 // @Failure 400 {object} dto.Error
 // @Failure 500 {object} dto.Error
+// @Security BearerAuth
 // @Router /api/v1/chats [post]
 func (h *ChatHandler) Create(c *gin.Context) {
 	chatCreate := &dto.ChatCreate{}
@@ -200,6 +205,7 @@ func (h *ChatHandler) Create(c *gin.Context) {
 // @Success 204 "No Content"
 // @Failure 400 {object} dto.Error
 // @Failure 404 {object} dto.Error
+// @Security BearerAuth
 // @Router /api/v1/chats/{id} [delete]
 func (h *ChatHandler) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -233,6 +239,7 @@ func (h *ChatHandler) Delete(c *gin.Context) {
 // @Failure 400 {object} dto.Error
 // @Failure 404 {object} dto.Error
 // @Failure 500 {object} dto.Error
+// @Security BearerAuth
 // @Router /api/v1/chats/{id} [put]
 func (h *ChatHandler) Update(c *gin.Context) {
 	ctx := c.Request.Context()

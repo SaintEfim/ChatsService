@@ -32,6 +32,7 @@ func (h *MessageHandler) ConfigureRoutes(r *gin.Engine) {
 // @Produce json
 // @Success 200 {object} []dto.Message
 // @Failure 500 {object} dto.Error
+// @Security BearerAuth
 // @Router /api/v1/messages [get]
 func (h *MessageHandler) Get(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -54,6 +55,7 @@ func (h *MessageHandler) Get(c *gin.Context) {
 // @Param id path string true "Message ID"
 // @Success 200 {object} []dto.Message
 // @Failure 500 {object} dto.Error
+// @Security BearerAuth
 // @Router /api/v1/messages/chat/{id} [get]
 func (h *MessageHandler) GetMessagesByChatId(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -86,6 +88,7 @@ func (h *MessageHandler) GetMessagesByChatId(c *gin.Context) {
 // @Success 200 {object} dto.Message
 // @Failure 400 {object} dto.Error
 // @Failure 404 {object} dto.Error
+// @Security BearerAuth
 // @Router /api/v1/messages/{id} [get]
 func (h *MessageHandler) GetOneById(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -118,6 +121,7 @@ func (h *MessageHandler) GetOneById(c *gin.Context) {
 // @Success 204 "No Content"
 // @Failure 400 {object} dto.Error
 // @Failure 404 {object} dto.Error
+// @Security BearerAuth
 // @Router /api/v1/messages/{id} [delete]
 func (h *MessageHandler) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -151,6 +155,7 @@ func (h *MessageHandler) Delete(c *gin.Context) {
 // @Failure 400 {object} dto.Error
 // @Failure 404 {object} dto.Error
 // @Failure 500 {object} dto.Error
+// @Security BearerAuth
 // @Router /api/v1/messages/{id} [put]
 func (h *MessageHandler) Update(c *gin.Context) {
 	ctx := c.Request.Context()

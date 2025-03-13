@@ -128,6 +128,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.Error'
+      security:
+      - BearerAuth: []
       tags:
       - Chats
     post:
@@ -155,6 +157,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.Error'
+      security:
+      - BearerAuth: []
       tags:
       - Chats
   /api/v1/chats/{id}:
@@ -180,6 +184,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/dto.Error'
+      security:
+      - BearerAuth: []
       tags:
       - Chats
     get:
@@ -206,6 +212,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/dto.Error'
+      security:
+      - BearerAuth: []
       tags:
       - Chats
     put:
@@ -240,6 +248,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.Error'
+      security:
+      - BearerAuth: []
       tags:
       - Chats
   /api/v1/chats/user/{id}:
@@ -265,6 +275,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.Error'
+      security:
+      - BearerAuth: []
       tags:
       - Chats
   /api/v1/chats/user/{user_id}/colleague/{colleague_id}:
@@ -299,6 +311,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.Error'
+      security:
+      - BearerAuth: []
       summary: Check if a chat exists
       tags:
       - Chats
@@ -319,6 +333,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.Error'
+      security:
+      - BearerAuth: []
       tags:
       - Messages
   /api/v1/messages/{id}:
@@ -344,6 +360,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/dto.Error'
+      security:
+      - BearerAuth: []
       tags:
       - Messages
     get:
@@ -370,6 +388,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/dto.Error'
+      security:
+      - BearerAuth: []
       tags:
       - Messages
     put:
@@ -404,6 +424,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.Error'
+      security:
+      - BearerAuth: []
       tags:
       - Messages
   /api/v1/messages/chat/{id}:
@@ -429,9 +451,16 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.Error'
+      security:
+      - BearerAuth: []
       tags:
       - Messages
 schemes:
 - http
 - https
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
