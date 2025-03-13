@@ -95,7 +95,7 @@ func (h *ChatHandler) GetChatsByUserId(c *gin.Context) {
 // @Failure 400 {object} dto.Error
 // @Failure 500 {object} dto.Error
 // @Security BearerAuth
-// @Router /api/v1/chats/user/{user_id}/colleague/{colleague_id} [get]
+// @Router /api/v1/chats/user/{user_id}/interlocutor/{interlocutorId} [get]
 func (h *ChatHandler) PrivateChatExists(c *gin.Context) {
 	ctx := c.Request.Context()
 

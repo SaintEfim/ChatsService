@@ -141,7 +141,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/chats/user/{user_id}/colleague/{colleague_id}": {
+        "/api/v1/chats/user/{user_id}/interlocutor/{interlocutorId}": {
             "get": {
                 "security": [
                     {
