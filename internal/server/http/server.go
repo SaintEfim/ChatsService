@@ -64,7 +64,8 @@ func (s *Server) Run(ctx context.Context) error {
 		s.configureSwagger(ctx, g)
 		s.configurationHandler(ctx, g)
 
-		s.httpSrv.Handler = g
+		handler := CorsSettings(s.cfg).Handler(g)
+		s.httpSrv.Handler = handler
 
 		s.logger.Sugar().Infof("HTTP Server run on %s", s.cfg.HTTPServer.Port)
 		if err := s.httpSrv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {

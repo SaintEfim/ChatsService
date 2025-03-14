@@ -11,6 +11,11 @@ import (
 
 func AuthMiddleware(logger *zap.Logger, secretKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if c.Request.Method == http.MethodOptions {
+			c.Next()
+			return
+		}
+
 		if strings.HasPrefix(c.Request.URL.Path, "/swagger") {
 			c.Next()
 			return

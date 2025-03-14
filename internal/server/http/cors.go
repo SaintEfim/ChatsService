@@ -14,6 +14,7 @@ func CorsSettings(cfg *config.Config) *cors.Cors {
 		AllowedOrigins: cfg.Cors.AllowedOrigins,
 		AllowedHeaders: []string{
 			"Content-Type",
+			"Authorization",
 		},
 		Debug: true,
 	})
