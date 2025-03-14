@@ -33,6 +33,7 @@ func (c *ChatGRPCServer) CreateMessage(ctx context.Context, req *chat.MessageCre
 	}
 
 	response.Id = message.Id.String()
+	response.CreateAt = message.CreatedAt.String()
 
 	return response, nil
 }
