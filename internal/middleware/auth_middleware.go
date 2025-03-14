@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func AuthMiddleware(logger *zap.Logger, key string) gin.HandlerFunc {
+func AuthMiddleware(logger *zap.Logger, secretKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if strings.HasPrefix(c.Request.URL.Path, "/swagger") {
 			c.Next()
@@ -30,7 +30,7 @@ func AuthMiddleware(logger *zap.Logger, key string) gin.HandlerFunc {
 
 		tokenStr := parts[1]
 		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-			return []byte(key), nil
+			return []byte(secretKey), nil
 		})
 
 		if err != nil || !token.Valid {
