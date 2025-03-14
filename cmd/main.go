@@ -44,7 +44,7 @@ func registerPostgres(lc fx.Lifecycle, db *gorm.DB) {
 	})
 }
 
-func registerServer(ctx context.Context, lifecycle fx.Lifecycle, srv interfaces.Server) {
+func registerServer(lifecycle fx.Lifecycle, srv interfaces.Server) {
 	lifecycle.Append(fx.Hook{
 		OnStart: srv.Run,
 		OnStop:  srv.Stop,
