@@ -27,17 +27,17 @@ definitions:
     type: object
   dto.ChatDetail:
     properties:
-      employees:
-        items:
-          $ref: '#/definitions/dto.Participant'
-        type: array
       id:
         type: string
       name:
         type: string
+      participants:
+        items:
+          $ref: '#/definitions/dto.Participant'
+        type: array
     required:
-    - employees
     - id
+    - participants
     type: object
   dto.ChatUpdate:
     properties:

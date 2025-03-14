@@ -613,21 +613,21 @@ const docTemplate = `{
         "dto.ChatDetail": {
             "type": "object",
             "required": [
-                "employees",
-                "id"
+                "id",
+                "participants"
             ],
             "properties": {
-                "employees": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.Participant"
-                    }
-                },
                 "id": {
                     "type": "string"
                 },
                 "name": {
                     "type": "string"
+                },
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.Participant"
+                    }
                 }
             }
         },
