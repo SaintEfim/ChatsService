@@ -80,25 +80,6 @@ func (c *ChatController) GetChatsByUserId(ctx context.Context, userId uuid.UUID)
 	return chats, nil
 }
 
-func (c *ChatController) PrivateChatExists(ctx context.Context, userId uuid.UUID, interlocutorId uuid.UUID) (bool, error) {
-	if userId == interlocutorId {
-		return false, nil
-	}
-
-	chatEntities, err := c.rep.Get(ctx)
-	if err != nil {
-		return false, err
-	}
-
-	for _, chatEntity := range chatEntities {
-		if chatEntity.ParticipantIds.Contains(userId) && chatEntity.ParticipantIds.Contains(interlocutorId) {
-			return true, nil
-		}
-	}
-
-	return false, nil
-}
-
 func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.ChatDetail, error) {
 	chatEntity, err := c.rep.GetOneById(ctx, id)
 	if err != nil {

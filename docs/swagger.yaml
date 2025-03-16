@@ -279,43 +279,6 @@ paths:
       - BearerAuth: []
       tags:
       - Chats
-  /api/v1/chats/user/{user_id}/interlocutor/{interlocutorId}:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: string
-      - description: Colleague ID
-        in: path
-        name: colleague_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: boolean
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dto.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/dto.Error'
-      security:
-      - BearerAuth: []
-      summary: Check if a chat exists
-      tags:
-      - Chats
   /api/v1/messages:
     get:
       consumes:

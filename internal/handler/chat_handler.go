@@ -21,7 +21,6 @@ func NewChatHandler(controller interfaces.ChatController) interfaces.Handler[dto
 func (h *ChatHandler) ConfigureRoutes(r *gin.Engine) {
 	r.GET("/api/v1/chats", h.Get)
 	r.GET("/api/v1/chats/user/:id", h.GetChatsByUserId)
-	r.GET("/api/v1/chats/user/:id/interlocutor/:interlocutorId", h.PrivateChatExists)
 	r.GET("/api/v1/chats/:id", h.GetOneById)
 	r.POST("/api/v1/chats", h.Create)
 	r.DELETE("/api/v1/chats/:id", h.Delete)
@@ -82,51 +81,6 @@ func (h *ChatHandler) GetChatsByUserId(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, chats)
-}
-
-// PrivateChatExists checks if a chat exists between two users
-// @Summary Check if a chat exists
-// @Tags Chats
-// @Accept json
-// @Produce json
-// @Param user_id path string true "User ID"
-// @Param colleague_id path string true "Colleague ID"
-// @Success 200 {object} map[string]bool
-// @Failure 400 {object} dto.Error
-// @Failure 500 {object} dto.Error
-// @Security BearerAuth
-// @Router /api/v1/chats/user/{user_id}/interlocutor/{interlocutorId} [get]
-func (h *ChatHandler) PrivateChatExists(c *gin.Context) {
-	ctx := c.Request.Context()
-
-	userId, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, dto.Error{
-			Status:      http.StatusBadRequest,
-			Description: err.Error(),
-		})
-		return
-	}
-
-	interlocutorId, err := uuid.Parse(c.Param("interlocutorId"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, dto.Error{
-			Status:      http.StatusBadRequest,
-			Description: err.Error(),
-		})
-		return
-	}
-
-	exists, err := h.controller.PrivateChatExists(ctx, userId, interlocutorId)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.Error{
-			Status:      http.StatusInternalServerError,
-			Description: err.Error(),
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"exists": exists})
 }
 
 // GetOneById @Summary Get chat by ID

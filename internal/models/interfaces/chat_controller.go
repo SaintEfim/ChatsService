@@ -11,7 +11,6 @@ import (
 type ChatController interface {
 	Get(ctx context.Context) ([]*dto.Chat, error)
 	GetChatsByUserId(ctx context.Context, userId uuid.UUID) ([]*dto.Chat, error)
-	PrivateChatExists(ctx context.Context, userId uuid.UUID, interlocutorId uuid.UUID) (bool, error)
 	GetOneById(ctx context.Context, id uuid.UUID) (*dto.ChatDetail, error)
 	Create(ctx context.Context, model *dto.ChatCreate) (*dto.CreateAction, error)
 	Delete(ctx context.Context, id uuid.UUID) error
