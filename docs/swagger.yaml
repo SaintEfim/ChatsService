@@ -18,12 +18,12 @@ definitions:
     properties:
       name:
         type: string
-      participant_ids:
+      participantIds:
         items:
           type: string
         type: array
     required:
-    - participant_ids
+    - participantIds
     type: object
   dto.ChatDetail:
     properties:
@@ -43,12 +43,12 @@ definitions:
     properties:
       name:
         type: string
-      participant_ids:
+      participantIds:
         items:
           type: string
         type: array
     required:
-    - participant_ids
+    - participantIds
     type: object
   dto.Error:
     properties:
@@ -64,24 +64,24 @@ definitions:
     type: object
   dto.Message:
     properties:
-      chat_id:
+      chatId:
         type: string
-      created_at:
+      createdAt:
         type: string
       id:
         type: string
-      receiver_id:
+      receiverId:
         type: string
-      sender_id:
+      senderId:
         type: string
       text:
         type: string
     required:
-    - chat_id
-    - created_at
+    - chatId
+    - createdAt
     - id
-    - receiver_id
-    - sender_id
+    - receiverId
+    - senderId
     - text
     type: object
   dto.MessageUpdate:

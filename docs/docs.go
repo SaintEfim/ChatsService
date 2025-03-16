@@ -596,13 +596,13 @@ const docTemplate = `{
         "dto.ChatCreate": {
             "type": "object",
             "required": [
-                "participant_ids"
+                "participantIds"
             ],
             "properties": {
                 "name": {
                     "type": "string"
                 },
-                "participant_ids": {
+                "participantIds": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -634,13 +634,13 @@ const docTemplate = `{
         "dto.ChatUpdate": {
             "type": "object",
             "required": [
-                "participant_ids"
+                "participantIds"
             ],
             "properties": {
                 "name": {
                     "type": "string"
                 },
-                "participant_ids": {
+                "participantIds": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -669,27 +669,27 @@ const docTemplate = `{
         "dto.Message": {
             "type": "object",
             "required": [
-                "chat_id",
-                "created_at",
+                "chatId",
+                "createdAt",
                 "id",
-                "receiver_id",
-                "sender_id",
+                "receiverId",
+                "senderId",
                 "text"
             ],
             "properties": {
-                "chat_id": {
+                "chatId": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
-                "receiver_id": {
+                "receiverId": {
                     "type": "string"
                 },
-                "sender_id": {
+                "senderId": {
                     "type": "string"
                 },
                 "text": {
