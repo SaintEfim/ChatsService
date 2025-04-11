@@ -2,6 +2,7 @@ package validator
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"ChatsService/internal/models/dto"
@@ -9,81 +10,53 @@ import (
 	"ChatsService/internal/models/interfaces"
 	clientValidator "ChatsService/pkg/validator"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )
 
 type ChatValidator struct {
-	validate          *validator.Validate
 	chatRepo          interfaces.Repository[entity.Chat]
 	employeeValidator *clientValidator.EmployeeValidator
 }
 
-func NewChatValidator(chatRepo interfaces.Repository[entity.Chat], employeeValidator *clientValidator.EmployeeValidator) *ChatValidator {
-	v := &ChatValidator{
-		validate:          validator.New(),
+func NewChatValidator(
+	chatRepo interfaces.Repository[entity.Chat],
+	employeeValidator *clientValidator.EmployeeValidator,
+) *ChatValidator {
+	return &ChatValidator{
 		chatRepo:          chatRepo,
 		employeeValidator: employeeValidator,
 	}
-	v.registerCustomValidations()
-	return v
 }
 
-func (v *ChatValidator) Validate(chat *dto.ChatCreate) error {
+func (v *ChatValidator) Validate(ctx context.Context, chat *dto.ChatCreate) error {
 	if chat == nil {
-		return fmt.Errorf("chat cannot be nil")
+		return errors.New("chat cannot be nil")
 	}
-	return v.validate.Struct(chat)
-}
 
-func (v *ChatValidator) registerCustomValidations() {
-	v.validate.RegisterStructValidation(v.validateChatStruct, dto.ChatCreate{})
-}
-
-func (v *ChatValidator) validateChatStruct(sl validator.StructLevel) {
-	chat, ok := sl.Current().Interface().(dto.ChatCreate)
-	if !ok {
-		sl.ReportError(nil, "", "", "invalid chat type", "")
-		return
+	if len(chat.ParticipantIds) != 2 {
+		return errors.New("private chat must have exactly 2 participants")
 	}
 
 	if hasDuplicates(chat.ParticipantIds) {
-		sl.ReportError(chat.ParticipantIds, "ParticipantIds", "ParticipantIds", "duplicate participant IDs found", "")
-		return
+		return errors.New("duplicate participant IDs found")
 	}
 
-	ctx := context.Background()
-	v.validatePrivateChat(sl, chat)
-	v.validateGroupChat(sl, chat)
-	v.employeeValidator.ValidateEmployeesExist(ctx, sl, chat.ParticipantIds)
-}
-
-func (v *ChatValidator) validatePrivateChat(sl validator.StructLevel, chat dto.ChatCreate) {
-	if chat.Name != "" {
-		sl.ReportError(chat.Name, "Name", "", "name must be empty for private chats", "")
-	}
-	if len(chat.ParticipantIds) != 2 {
-		sl.ReportError(chat.ParticipantIds, "ParticipantIds", "", "private chat must have exactly 2 participants", "")
-		return
+	if err := v.employeeValidator.ValidateEmployeesExist(ctx, chat.ParticipantIds); err != nil {
+		return fmt.Errorf("employee validation failed: %w", err)
 	}
 
-	existing, err := v.chatRepo.Get(context.Background())
+	existingChats, err := v.chatRepo.Get(ctx)
 	if err != nil {
-		sl.ReportError(chat.Name, "Name", "", fmt.Sprintf("error checking existing chats: %v", err), "")
-		return
+		return fmt.Errorf("error checking existing chats: %w", err)
 	}
-	for _, ec := range existing {
+
+	for _, ec := range existingChats {
 		if uuidSlicesEqual(ec.ParticipantIds, chat.ParticipantIds) {
-			sl.ReportError(chat.ParticipantIds, "ParticipantIds", "", "chat with these participants already exists", "")
-			break
+			return errors.New("chat with these participants already exists")
 		}
 	}
-}
 
-func (v *ChatValidator) validateGroupChat(sl validator.StructLevel, chat dto.ChatCreate) {
-	if len(chat.ParticipantIds) < 1 {
-		sl.ReportError(chat.ParticipantIds, "ParticipantIds", "", "group chat must have at least 1 participant", "")
-	}
+	return nil
 }
 
 func uuidSlicesEqual(a, b []uuid.UUID) bool {

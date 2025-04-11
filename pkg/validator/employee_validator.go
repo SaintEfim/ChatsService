@@ -2,12 +2,12 @@ package validator
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"ChatsService/internal/models/interfaces"
 	"ChatsService/proto/employee"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )
 
@@ -23,9 +23,8 @@ func NewEmployeeValidator(client interfaces.EmployeeGrpcClient) *EmployeeValidat
 
 func (v *EmployeeValidator) ValidateEmployeesExist(
 	ctx context.Context,
-	sl validator.StructLevel,
 	employeeIds []uuid.UUID,
-) {
+) error {
 	employeeIdsStr := make([]string, len(employeeIds))
 	for i, id := range employeeIds {
 		employeeIdsStr[i] = id.String()
@@ -33,23 +32,12 @@ func (v *EmployeeValidator) ValidateEmployeesExist(
 
 	exist, err := v.client.Search(ctx, &employee.SearchRequest{Ids: employeeIdsStr})
 	if err != nil {
-		sl.ReportError(
-			"employeeId",
-			"EmployeeIds",
-			"",
-			fmt.Sprintf("employee check failed: %v", err),
-			"",
-		)
-		return
+		return fmt.Errorf("employee check failed: %w", err)
 	}
 
-	if exist == nil {
-		sl.ReportError(
-			"employeeId",
-			"EmployeeIds",
-			"",
-			"not found employees",
-			"",
-		)
+	if exist == nil || len(exist.Employees) != len(employeeIds) {
+		return errors.New("one or more employees do not exist")
 	}
+
+	return nil
 }

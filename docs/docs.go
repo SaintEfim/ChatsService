@@ -187,63 +187,6 @@ const docTemplate = `{
                     }
                 }
             },
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Chats"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Chat ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Chat info",
-                        "name": "chat",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.ChatUpdate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Error"
-                        }
-                    }
-                }
-            },
             "delete": {
                 "security": [
                     {
@@ -524,9 +467,6 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "name": {
-                    "type": "string"
-                },
                 "participants": {
                     "type": "array",
                     "items": {
@@ -541,9 +481,6 @@ const docTemplate = `{
                 "participantIds"
             ],
             "properties": {
-                "name": {
-                    "type": "string"
-                },
                 "participantIds": {
                     "type": "array",
                     "items": {
@@ -562,30 +499,10 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "name": {
-                    "type": "string"
-                },
                 "participants": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dto.Participant"
-                    }
-                }
-            }
-        },
-        "dto.ChatUpdate": {
-            "type": "object",
-            "required": [
-                "participantIds"
-            ],
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "participantIds": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
                     }
                 }
             }

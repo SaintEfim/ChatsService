@@ -15,91 +15,96 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func NewMessageCreate(modifiers ...func(*dto.MessageCreate)) *dto.MessageCreate {
-	base := &dto.MessageCreate{
-		ChatId:     uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-		SenderId:   uuid.MustParse("00000000-0000-0000-0000-000000000002"),
-		ReceiverId: uuid.MustParse("00000000-0000-0000-0000-000000000003"),
-		Text:       "Hello",
+const (
+	testChatID     = "00000000-0000-0000-0000-000000000001"
+	testSenderID   = "00000000-0000-0000-0000-000000000002"
+	testReceiverID = "00000000-0000-0000-0000-000000000003"
+	testMessageTxt = "Test message"
+)
+
+func newTestMessage(modifiers ...func(*dto.MessageCreate)) *dto.MessageCreate {
+	msg := &dto.MessageCreate{
+		ChatId:     uuid.MustParse(testChatID),
+		SenderId:   uuid.MustParse(testSenderID),
+		ReceiverId: uuid.MustParse(testReceiverID),
+		Text:       testMessageTxt,
 	}
 
-	msg := base
 	for _, modify := range modifiers {
 		modify(msg)
 	}
-
 	return msg
 }
 
-func TestMessageValidatorSenderIdEqualReceiverId(t *testing.T) {
+func newTestSearchRequest() *employee.SearchRequest {
+	return &employee.SearchRequest{
+		Ids: []string{testSenderID, testReceiverID},
+	}
+}
+
+func TestMessageValidator_SenderEqualsReceiver(t *testing.T) {
 	mockClient := mocks.NewEmployeeGrpcClient(t)
 	validator := NewMessageValidator(clientValidator.NewEmployeeValidator(mockClient))
-	expectErrContains := "failed on the 'notEqual' tag"
 
-	err := validator.Validate(NewMessageCreate(func(m *dto.MessageCreate) {
+	msg := newTestMessage(func(m *dto.MessageCreate) {
 		m.ReceiverId = m.SenderId
-	}))
+	})
+
+	err := validator.Validate(msg)
 
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), expectErrContains)
-
-	mockClient.AssertNotCalled(t, "Search", mock.Anything, mock.Anything)
+	assert.EqualError(t, err, "sender and receiver must be different")
+	mockClient.AssertNotCalled(t, "Search")
 }
 
 func TestMessageValidator(t *testing.T) {
-	type mockSearchResult struct {
-		response *employee.SearchResponse
-		err      error
+	type validatorTestCase struct {
+		name          string
+		mockResponse  *employee.SearchResponse
+		mockError     error
+		expectedError error
 	}
 
-	testCases := []struct {
-		name              string
-		message           *dto.MessageCreate
-		searchResult      mockSearchResult
-		expectErrContains string
-	}{
+	testCases := []validatorTestCase{
 		{
-			name:    "Valid message",
-			message: NewMessageCreate(),
-			searchResult: mockSearchResult{
-				response: &employee.SearchResponse{},
+			name: "Valid message",
+			mockResponse: &employee.SearchResponse{
+				Employees: []*employee.Employee{
+					{Id: testSenderID},
+					{Id: testReceiverID},
+				},
 			},
 		},
 		{
-			name:    "Employee search returns error",
-			message: NewMessageCreate(),
-			searchResult: mockSearchResult{
-				err: errors.New("employee check failed"),
-			},
-			expectErrContains: "employee check failed",
+			name:          "gRPC connection error",
+			mockError:     errors.New("connection error"),
+			expectedError: errors.New("employee validation failed: employee check failed: connection error"),
 		},
 		{
-			name:    "Employee not found",
-			message: NewMessageCreate(),
-			searchResult: mockSearchResult{
-				response: nil,
+			name: "Employee not found",
+			mockResponse: &employee.SearchResponse{
+				Employees: []*employee.Employee{{Id: testSenderID}},
 			},
-			expectErrContains: "not found employees",
+			expectedError: errors.New("employee validation failed: one or more employees do not exist"),
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			mockEmployeeGrpcClient := mocks.NewEmployeeGrpcClient(t)
-
-			mockEmployeeGrpcClient.On("Search", mock.Anything, mock.Anything).
-				Return(tc.searchResult.response, tc.searchResult.err).
+			mockClient := mocks.NewEmployeeGrpcClient(t)
+			mockClient.On("Search", mock.Anything, newTestSearchRequest()).
+				Return(tc.mockResponse, tc.mockError).
 				Once()
 
 			validator := NewMessageValidator(
-				clientValidator.NewEmployeeValidator(mockEmployeeGrpcClient),
+				clientValidator.NewEmployeeValidator(mockClient),
 			)
 
-			err := validator.Validate(tc.message)
+			err := validator.Validate(newTestMessage())
 
-			if tc.expectErrContains != "" {
+			if tc.expectedError != nil {
 				require.Error(t, err)
-				assert.Contains(t, err.Error(), tc.expectErrContains)
+				assert.EqualError(t, err, tc.expectedError.Error())
 			} else {
 				assert.NoError(t, err)
 			}

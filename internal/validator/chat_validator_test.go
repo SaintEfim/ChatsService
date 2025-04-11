@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"context"
 	"testing"
 
 	"ChatsService/internal/mocks"
@@ -15,74 +16,75 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func NewChatCreate(modifiers ...func(*dto.ChatCreate)) *dto.ChatCreate {
+func newTestChat(modifiers ...func(*dto.ChatCreate)) *dto.ChatCreate {
 	base := &dto.ChatCreate{
-		Name: "",
 		ParticipantIds: []uuid.UUID{
 			uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 			uuid.MustParse("00000000-0000-0000-0000-000000000002"),
 		},
 	}
 
-	msg := base
 	for _, modify := range modifiers {
-		modify(msg)
+		modify(base)
 	}
-
-	return msg
+	return base
 }
 
-func TestChatValidator(t *testing.T) {
-	type mockChatRepositoryResult struct {
-		response []*entity.Chat
-		err      error
+func TestChatValidator_Scenarios(t *testing.T) {
+	type mockChatRepoResult struct {
+		chats []*entity.Chat
+		err   error
 	}
 
-	type mockEmployeeSearchResult struct {
-		response *employee.SearchResponse
-		err      error
+	type mockEmployeeSearchRes struct {
+		res *employee.SearchResponse
+		err error
 	}
 
-	tests := []struct {
-		name                     string
-		chat                     *dto.ChatCreate
-		mockChatRepositoryResult mockChatRepositoryResult
-		employeeSearchResult     mockEmployeeSearchResult
-		expectErrContains        string
+	testCases := []struct {
+		name            string
+		chat            *dto.ChatCreate
+		mockChatResult  mockChatRepoResult
+		mockEmployeeRes mockEmployeeSearchRes
+		expectedError   string
 	}{
 		{
-			name: "Valid chat",
-			chat: NewChatCreate(),
-			mockChatRepositoryResult: mockChatRepositoryResult{
-				response: nil,
+			name: "Valid chat creation",
+			chat: newTestChat(),
+			mockChatResult: mockChatRepoResult{
+				chats: nil,
 			},
-			employeeSearchResult: mockEmployeeSearchResult{
-				response: &employee.SearchResponse{},
+			mockEmployeeRes: mockEmployeeSearchRes{
+				res: &employee.SearchResponse{
+					Employees: []*employee.Employee{
+						{Id: "00000000-0000-0000-0000-000000000001"},
+						{Id: "00000000-0000-0000-0000-000000000002"},
+					},
+				},
 			},
 		},
 	}
 
-	for _, tc := range tests {
+	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			mockChatRepository := mocks.NewRepository[entity.Chat](t)
-			mockEmployeeGrpcClient := mocks.NewEmployeeGrpcClient(t)
+			mockChatRepo := mocks.NewRepository[entity.Chat](t)
+			mockEmployeeClient := mocks.NewEmployeeGrpcClient(t)
 
-			mockChatRepository.On("Get", mock.Anything).Return(tc.mockChatRepositoryResult.response, tc.mockChatRepositoryResult.err).Once()
-
-			mockEmployeeGrpcClient.On("Search", mock.Anything, mock.Anything).
-				Return(tc.employeeSearchResult.response, tc.employeeSearchResult.err).
+			mockChatRepo.On("Get", mock.Anything).Return(tc.mockChatResult.chats, tc.mockChatResult.err).Once()
+			mockEmployeeClient.On("Search", mock.Anything, mock.Anything).
+				Return(tc.mockEmployeeRes.res, tc.mockEmployeeRes.err).
 				Once()
 
 			validator := NewChatValidator(
-				mockChatRepository,
-				clientValidator.NewEmployeeValidator(mockEmployeeGrpcClient),
+				mockChatRepo,
+				clientValidator.NewEmployeeValidator(mockEmployeeClient),
 			)
 
-			err := validator.Validate(tc.chat)
+			err := validator.Validate(context.Background(), tc.chat)
 
-			if tc.expectErrContains != "" {
+			if tc.expectedError != "" {
 				require.Error(t, err)
-				assert.Contains(t, err.Error(), tc.expectErrContains)
+				assert.Contains(t, err.Error(), tc.expectedError)
 			} else {
 				assert.NoError(t, err)
 			}

@@ -154,24 +154,6 @@ func (_m *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Ch
 	return r0, r1
 }
 
-// Update provides a mock function with given fields: ctx, id, model
-func (_m *ChatController) Update(ctx context.Context, id uuid.UUID, model *dto.ChatUpdate) error {
-	ret := _m.Called(ctx, id, model)
-
-	if len(ret) == 0 {
-		panic("no return value specified for Update")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *dto.ChatUpdate) error); ok {
-		r0 = rf(ctx, id, model)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
 // NewChatController creates a new instance of ChatController. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewChatController(t interface {

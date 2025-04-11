@@ -14,5 +14,4 @@ type ChatController interface {
 	GetOneById(ctx context.Context, id uuid.UUID) (*dto.ChatDetail, error)
 	Create(ctx context.Context, model *dto.ChatCreate) (*dto.CreateAction, error)
 	Delete(ctx context.Context, id uuid.UUID) error
-	Update(ctx context.Context, id uuid.UUID, model *dto.ChatUpdate) error
 }

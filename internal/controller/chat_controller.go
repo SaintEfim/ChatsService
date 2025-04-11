@@ -40,7 +40,6 @@ func (c *ChatController) Get(ctx context.Context) ([]*dto.Chat, error) {
 
 		chat := &dto.Chat{
 			Id:           chatEntity.Id,
-			Name:         chatEntity.Name,
 			Participants: participant,
 		}
 
@@ -70,7 +69,6 @@ func (c *ChatController) GetChatsByUserId(ctx context.Context, userId uuid.UUID)
 
 		chat := &dto.Chat{
 			Id:           chatEntity.Id,
-			Name:         chatEntity.Name,
 			Participants: participants,
 		}
 
@@ -93,7 +91,6 @@ func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Cha
 
 	chat := &dto.ChatDetail{
 		Id:           chatEntity.Id,
-		Name:         chatEntity.Name,
 		Participants: participants,
 	}
 
@@ -101,12 +98,11 @@ func (c *ChatController) GetOneById(ctx context.Context, id uuid.UUID) (*dto.Cha
 }
 
 func (c *ChatController) Create(ctx context.Context, chat *dto.ChatCreate) (*dto.CreateAction, error) {
-	if err := c.chatValidator.Validate(chat); err != nil {
+	if err := c.chatValidator.Validate(ctx, chat); err != nil {
 		return nil, err
 	}
 
 	createRes, err := c.rep.Create(ctx, &entity.Chat{
-		Name:           chat.Name,
 		ParticipantIds: chat.ParticipantIds,
 	})
 	if err != nil {
@@ -122,18 +118,6 @@ func (c *ChatController) Create(ctx context.Context, chat *dto.ChatCreate) (*dto
 
 func (c *ChatController) Delete(ctx context.Context, id uuid.UUID) error {
 	err := c.rep.Delete(ctx, id)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (c *ChatController) Update(ctx context.Context, id uuid.UUID, chat *dto.ChatUpdate) error {
-	err := c.rep.Update(ctx, id, &entity.Chat{
-		Name:           chat.Name,
-		ParticipantIds: chat.ParticipantIds,
-	})
 	if err != nil {
 		return err
 	}

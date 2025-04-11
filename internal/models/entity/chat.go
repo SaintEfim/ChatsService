@@ -56,7 +56,6 @@ func (ua UUIDArray) ToStringSlice() []string {
 type Chat struct {
 	gorm.Model
 	Id             uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primary_key"`
-	Name           string
 	ParticipantIds UUIDArray `gorm:"type:uuid[]"`
 	Messages       []Message
 }
