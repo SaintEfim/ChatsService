@@ -34,57 +34,62 @@ func NewMessageCreate(modifiers ...func(*dto.MessageCreate)) *dto.MessageCreate 
 func TestMessageValidatorSenderIdEqualReceiverId(t *testing.T) {
 	mockClient := mocks.NewEmployeeGrpcClient(t)
 	validator := NewMessageValidator(clientValidator.NewEmployeeValidator(mockClient))
+	expectErrContains := "failed on the 'notEqual' tag"
 
 	err := validator.Validate(NewMessageCreate(func(m *dto.MessageCreate) {
 		m.ReceiverId = m.SenderId
 	}))
 
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "failed on the 'notEqual' tag")
+	assert.Contains(t, err.Error(), expectErrContains)
 
 	mockClient.AssertNotCalled(t, "Search", mock.Anything, mock.Anything)
 }
 
 func TestMessageValidator(t *testing.T) {
-	tests := []struct {
+	type mockSearchResult struct {
+		response *employee.SearchResponse
+		err      error
+	}
+
+	testCases := []struct {
 		name              string
 		message           *dto.MessageCreate
-		mockSearchResp    *employee.SearchResponse
-		mockSearchErr     error
+		searchResult      mockSearchResult
 		expectErrContains string
 	}{
 		{
-			name:           "Valid message",
-			message:        NewMessageCreate(),
-			mockSearchResp: &employee.SearchResponse{}, // успешный ответ
+			name:    "Valid message",
+			message: NewMessageCreate(),
+			searchResult: mockSearchResult{
+				response: &employee.SearchResponse{},
+			},
 		},
 		{
-			name:              "Search employee returns error",
-			message:           NewMessageCreate(),
-			mockSearchErr:     errors.New("employee check failed"),
+			name:    "Employee search returns error",
+			message: NewMessageCreate(),
+			searchResult: mockSearchResult{
+				err: errors.New("employee check failed"),
+			},
 			expectErrContains: "employee check failed",
 		},
 		{
-			name:              "Search returns nil response",
-			message:           NewMessageCreate(),
-			mockSearchResp:    nil,
+			name:    "Employee not found",
+			message: NewMessageCreate(),
+			searchResult: mockSearchResult{
+				response: nil,
+			},
 			expectErrContains: "not found employees",
 		},
 	}
 
-	for _, tc := range tests {
+	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			mockEmployeeGrpcClient := mocks.NewEmployeeGrpcClient(t)
 
-			if tc.mockSearchErr != nil {
-				mockEmployeeGrpcClient.
-					On("Search", mock.Anything, mock.Anything).
-					Return(nil, tc.mockSearchErr).Once()
-			} else {
-				mockEmployeeGrpcClient.
-					On("Search", mock.Anything, mock.Anything).
-					Return(tc.mockSearchResp, nil).Once()
-			}
+			mockEmployeeGrpcClient.On("Search", mock.Anything, mock.Anything).
+				Return(tc.searchResult.response, tc.searchResult.err).
+				Once()
 
 			validator := NewMessageValidator(
 				clientValidator.NewEmployeeValidator(mockEmployeeGrpcClient),
