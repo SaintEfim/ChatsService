@@ -48,7 +48,7 @@ func (v *EmployeeValidator) ValidateEmployeesExist(
 			"employeeId",
 			"EmployeeIds",
 			"",
-			"one or more employees do not exist",
+			"not found employees",
 			"",
 		)
 	}

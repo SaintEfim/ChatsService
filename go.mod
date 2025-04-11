@@ -11,7 +11,7 @@ require (
 	github.com/only1nft/gormzap v0.0.0-20220406033416-a558a248eac0
 	github.com/rs/cors v1.11.1
 	github.com/spf13/viper v1.19.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.4
