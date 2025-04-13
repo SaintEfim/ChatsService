@@ -36,38 +36,47 @@ func newTestMessage(modifiers ...func(*dto.MessageCreate)) *dto.MessageCreate {
 	return msg
 }
 
-func newTestSearchRequest() *employee.SearchRequest {
-	return &employee.SearchRequest{
-		Ids: []string{testSenderID, testReceiverID},
-	}
-}
+func TestMessageValidator_InputValidation(t *testing.T) {
+	t.Run("Sender equals receiver", func(t *testing.T) {
+		mockClient := mocks.NewEmployeeGrpcClient(t)
+		validator := NewMessageValidator(clientValidator.NewEmployeeValidator(mockClient))
 
-func TestMessageValidator_SenderEqualsReceiver(t *testing.T) {
-	mockClient := mocks.NewEmployeeGrpcClient(t)
-	validator := NewMessageValidator(clientValidator.NewEmployeeValidator(mockClient))
+		msg := newTestMessage(func(m *dto.MessageCreate) {
+			m.ReceiverId = m.SenderId
+		})
 
-	msg := newTestMessage(func(m *dto.MessageCreate) {
-		m.ReceiverId = m.SenderId
+		err := validator.Validate(msg)
+
+		require.Error(t, err)
+		assert.EqualError(t, err, "sender and receiver must be different")
+		mockClient.AssertNotCalled(t, "Search")
 	})
 
-	err := validator.Validate(msg)
+	t.Run("Empty message text", func(t *testing.T) {
+		mockClient := mocks.NewEmployeeGrpcClient(t)
+		validator := NewMessageValidator(clientValidator.NewEmployeeValidator(mockClient))
 
-	require.Error(t, err)
-	assert.EqualError(t, err, "sender and receiver must be different")
-	mockClient.AssertNotCalled(t, "Search")
+		msg := newTestMessage(func(m *dto.MessageCreate) {
+			m.Text = ""
+		})
+
+		err := validator.Validate(msg)
+
+		require.Error(t, err)
+		assert.EqualError(t, err, "text is required")
+		mockClient.AssertNotCalled(t, "Search")
+	})
 }
 
-func TestMessageValidator(t *testing.T) {
-	type validatorTestCase struct {
+func TestMessageValidator_EmployeeValidation(t *testing.T) {
+	testCases := []struct {
 		name          string
 		mockResponse  *employee.SearchResponse
 		mockError     error
-		expectedError error
-	}
-
-	testCases := []validatorTestCase{
+		expectedError string
+	}{
 		{
-			name: "Valid message",
+			name: "Valid employees",
 			mockResponse: &employee.SearchResponse{
 				Employees: []*employee.Employee{
 					{Id: testSenderID},
@@ -78,21 +87,25 @@ func TestMessageValidator(t *testing.T) {
 		{
 			name:          "gRPC connection error",
 			mockError:     errors.New("connection error"),
-			expectedError: errors.New("employee validation failed: employee check failed: connection error"),
+			expectedError: "employee validation failed: employee check failed: connection error",
 		},
 		{
 			name: "Employee not found",
 			mockResponse: &employee.SearchResponse{
 				Employees: []*employee.Employee{{Id: testSenderID}},
 			},
-			expectedError: errors.New("employee validation failed: one or more employees do not exist"),
+			expectedError: "employee validation failed: one or more employees do not exist",
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			mockClient := mocks.NewEmployeeGrpcClient(t)
-			mockClient.On("Search", mock.Anything, newTestSearchRequest()).
+			expectedRequest := &employee.SearchRequest{
+				Ids: []string{testSenderID, testReceiverID},
+			}
+
+			mockClient.On("Search", mock.Anything, expectedRequest).
 				Return(tc.mockResponse, tc.mockError).
 				Once()
 
@@ -102,12 +115,14 @@ func TestMessageValidator(t *testing.T) {
 
 			err := validator.Validate(newTestMessage())
 
-			if tc.expectedError != nil {
+			if tc.expectedError != "" {
 				require.Error(t, err)
-				assert.EqualError(t, err, tc.expectedError.Error())
+				assert.Contains(t, err.Error(), tc.expectedError)
 			} else {
 				assert.NoError(t, err)
 			}
+
+			mockClient.AssertExpectations(t)
 		})
 	}
 }
