@@ -4,8 +4,6 @@ definitions:
     properties:
       id:
         type: string
-      name:
-        type: string
       participants:
         items:
           $ref: '#/definitions/dto.Participant'
@@ -16,8 +14,6 @@ definitions:
     type: object
   dto.ChatCreate:
     properties:
-      name:
-        type: string
       participantIds:
         items:
           type: string
@@ -29,8 +25,6 @@ definitions:
     properties:
       id:
         type: string
-      name:
-        type: string
       participants:
         items:
           $ref: '#/definitions/dto.Participant'
@@ -38,17 +32,6 @@ definitions:
     required:
     - id
     - participants
-    type: object
-  dto.ChatUpdate:
-    properties:
-      name:
-        type: string
-      participantIds:
-        items:
-          type: string
-        type: array
-    required:
-    - participantIds
     type: object
   dto.Error:
     properties:
@@ -210,42 +193,6 @@ paths:
             $ref: '#/definitions/dto.Error'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/dto.Error'
-      security:
-      - BearerAuth: []
-      tags:
-      - Chats
-    put:
-      consumes:
-      - application/json
-      parameters:
-      - description: Chat ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Chat info
-        in: body
-        name: chat
-        required: true
-        schema:
-          $ref: '#/definitions/dto.ChatUpdate'
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dto.Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/dto.Error'
-        "500":
-          description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.Error'
       security:
