@@ -24,7 +24,6 @@ func (h *ChatHandler) ConfigureRoutes(r *gin.Engine) {
 	r.GET("/api/v1/chats/:id", h.GetOneById)
 	r.POST("/api/v1/chats", h.Create)
 	r.DELETE("/api/v1/chats/:id", h.Delete)
-	r.PUT("/api/v1/chats/:id", h.Update)
 }
 
 // Get @Summary List chats
@@ -151,6 +150,11 @@ func (h *ChatHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, &dto.CreateAction{Id: createItem.Id})
 }
 
+func (h *ChatHandler) Update(c *gin.Context) {
+	//TODO implement me
+	panic("implement me")
+}
+
 // Delete @Summary Delete chat by ID
 // @Tags Chats
 // @Accept json
@@ -173,50 +177,6 @@ func (h *ChatHandler) Delete(c *gin.Context) {
 	}
 
 	if err := h.controller.Delete(ctx, id); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.Error{
-			Status:      http.StatusInternalServerError,
-			Description: err.Error(),
-		})
-		return
-	}
-
-	c.Status(http.StatusNoContent)
-}
-
-// Update @Summary Update chat by ID
-// @Tags Chats
-// @Accept json
-// @Produce json
-// @Param id path string true "Chat ID"
-// @Param chat body dto.ChatUpdate true "Chat info"
-// @Success 204 "No Content"
-// @Failure 400 {object} dto.Error
-// @Failure 404 {object} dto.Error
-// @Failure 500 {object} dto.Error
-// @Security BearerAuth
-// @Router /api/v1/chats/{id} [put]
-func (h *ChatHandler) Update(c *gin.Context) {
-	ctx := c.Request.Context()
-	chatUpdate := &dto.ChatUpdate{}
-
-	id, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, dto.Error{
-			Status:      http.StatusBadRequest,
-			Description: err.Error(),
-		})
-		return
-	}
-
-	if err := c.ShouldBindJSON(&chatUpdate); err != nil {
-		c.JSON(http.StatusBadRequest, dto.Error{
-			Status:      http.StatusBadRequest,
-			Description: err.Error(),
-		})
-		return
-	}
-
-	if err := h.controller.Update(ctx, id, chatUpdate); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.Error{
 			Status:      http.StatusInternalServerError,
 			Description: err.Error(),
