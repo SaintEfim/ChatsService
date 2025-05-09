@@ -3,6 +3,7 @@ package entity
 import (
 	"errors"
 	"strings"
+	"time"
 
 	"database/sql/driver"
 	"github.com/google/uuid"
@@ -53,9 +54,15 @@ func (ua UUIDArray) ToStringSlice() []string {
 	return strs
 }
 
+func (Chat) TableName() string {
+	return "Chats"
+}
+
 type Chat struct {
-	gorm.Model
-	Id             uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primary_key"`
-	ParticipantIds UUIDArray `gorm:"type:uuid[]"`
-	Messages       []Message
+	Id             uuid.UUID      `gorm:"type:uuid;default:gen_random_uuid();primaryKey;column:Id"`
+	CreatedAt      time.Time      ``
+	UpdatedAt      time.Time      ``
+	DeletedAt      gorm.DeletedAt `gorm:"index"`
+	ParticipantIds UUIDArray      `gorm:"type:uuid[];column:ParticipantIds"`
+	Messages       []Message      `gorm:"foreignKey:ChatId;references:Id"`
 }
